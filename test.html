@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tạo HTML Khóa Học</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f7f7f7;
+        }
+
+        .wrapper {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .panel {
+            background: #fff;
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .preview-box,
+        .output-box {
+            white-space: pre-wrap;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 14px;
+            border-radius: 8px;
+            overflow: auto;
+            min-height: 300px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+        }
+
+        .note {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 12px;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 14px;
+            background: #fff;
+        }
+
+        .custom-th,
+        .custom-td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            vertical-align: top;
+        }
+
+        .custom-th {
+            width: 220px;
+            background: #f1f5f9;
+            text-align: left;
+        }
+
+        .description-section p {
+            margin: 6px 0;
+        }
+
+        .editor-indent {
+            margin-left: 30px;
+        }
+
+        .action-row {
+            margin-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Công cụ nhập liệu và xuất HTML khóa học</h2>
+
+    <div class="wrapper">
+        <div class="panel">
+            <h3>Nhập thông tin</h3>
+
+            <div class="form-group">
+                <label>Mã học phần</label>
+                <input id="maHocPhan" value="LA4005">
+            </div>
+
+            <div class="form-group">
+                <label>Mã lớp học phần</label>
+                <input id="maLopHocPhan" value="TX-26T-LA4005-TEMPL">
+            </div>
+
+            <div class="form-group">
+                <label>Tên học phần</label>
+                <input id="tenHocPhan" value="Luật Hiến pháp">
+            </div>
+
+            <div class="form-group">
+                <label>Giảng viên</label>
+                <input id="giangVien" value="Th.S Võ Thị Minh Mẫn">
+            </div>
+
+            <div class="form-group">
+                <label>Thời gian học</label>
+                <input id="thoiGianHoc" value="Từ ngày 01/04/2026 đến ngày 30/06/2026">
+            </div>
+
+            <div class="form-group">
+                <label>Tổng quan về nội dung môn học</label>
+                <textarea
+                    id="tongQuan">Môn học cung cấp những kiến thức nền tảng về Luật Hiến pháp, giúp người học hiểu rõ bản chất, vai trò của Hiến pháp, chế độ chính trị, tổ chức bộ máy nhà nước và quyền, nghĩa vụ cơ bản của công dân.</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Mục tiêu học tập</label>
+                <textarea id="mucTieu">Nắm được kiến thức cơ bản về Luật Hiến pháp.
+Hiểu nội dung các quy định hiến định quan trọng.
+Vận dụng kiến thức vào học tập và thực tiễn.</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Yêu cầu đối với học viên</label>
+                <textarea id="yeuCau">Tham gia đầy đủ các buổi học.
+Đọc tài liệu trước khi lên lớp.
+Tích cực trao đổi và thảo luận.</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Phương pháp giảng dạy và đánh giá</label>
+                <textarea id="phuongPhap">Kết hợp thuyết giảng, thảo luận và tự học có hướng dẫn.
+Đánh giá qua chuyên cần, kiểm tra thường xuyên và thi kết thúc học phần.</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Giảng viên hỗ trợ</label>
+                <input id="giangVienHoTro" value="Th.S Võ Thị Minh Mẫn">
+            </div>
+
+            <div class="form-group">
+                <label>Hotline</label>
+                <input id="hotline" value="0900000000">
+            </div>
+
+            <div class="form-group">
+                <label>Email hỗ trợ</label>
+                <input id="emailHoTro" value="hotro@example.com">
+            </div>
+
+            <div class="form-group">
+                <label>Link gửi yêu cầu hỗ trợ</label>
+                <input id="linkHoTro" value="https://example.com/hotro">
+            </div>
+
+            <div class="form-group">
+                <label>Ngày kết thúc</label>
+                <input id="ngayKetThuc" value="30/06/2026">
+            </div>
+
+            <div class="form-group">
+                <label>Phòng học Google Meet</label>
+                <input id="phongHoc" value="https://meet.google.com/abc-defg-hij">
+            </div>
+
+            <div class="action-row">
+                <button onclick="generateHTML()">Xuất HTML hoàn chỉnh</button>
+                <button onclick="copyHTML()">Copy HTML</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>Kết quả HTML</h3>
+            <div class="note">Bấm nút để sinh nguyên đoạn HTML hoàn chỉnh.</div>
+            <div id="output" class="output-box"></div>
+        </div>
+    </div>
+
+    <script>
+        function escapeHtml(text) {
+            return String(text || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
+        function textToParagraphs(text) {
+            const lines = String(text || "")
+                .split("\n")
+                .map(line => line.trim())
+                .filter(Boolean);
+
+            if (!lines.length) return "<p></p>";
+            return lines.map(line => `<p>${escapeHtml(line)}</p>`).join("\n");
+        }
+
+        function textToBulletParagraphs(text) {
+            const lines = String(text || "")
+                .split("\n")
+                .map(line => line.trim())
+                .filter(Boolean);
+
+            if (!lines.length) return "<p>• </p>";
+            return lines.map(line => `<p>• ${escapeHtml(line)}</p>`).join("\n");
+        }
+
+        function generateHTML() {
+            const data = {
+                maHocPhan: document.getElementById("maHocPhan").value,
+                maLopHocPhan: document.getElementById("maLopHocPhan").value,
+                tenHocPhan: document.getElementById("tenHocPhan").value,
+                giangVien: document.getElementById("giangVien").value,
+                thoiGianHoc: document.getElementById("thoiGianHoc").value,
+                tongQuan: document.getElementById("tongQuan").value,
+                mucTieu: document.getElementById("mucTieu").value,
+                yeuCau: document.getElementById("yeuCau").value,
+                phuongPhap: document.getElementById("phuongPhap").value,
+                giangVienHoTro: document.getElementById("giangVienHoTro").value,
+                hotline: document.getElementById("hotline").value,
+                emailHoTro: document.getElementById("emailHoTro").value,
+                linkHoTro: document.getElementById("linkHoTro").value,
+                ngayKetThuc: document.getElementById("ngayKetThuc").value,
+                phongHoc: document.getElementById("phongHoc").value
+            };
+
+            const finalHTML = `<div class="container">
+    <h5>Thông Tin Khóa Học</h5>
+    <table class="custom-table">
+        <tbody>
+            <tr>
+                <th class="custom-th">Mã học phần</th>
+                <td class="custom-td"><span data-sheets-root="1"><strong>${escapeHtml(data.maHocPhan)}</strong></span><br></td>
+            </tr>
+            <tr>
+                <th class="custom-th">Mã lớp học phần</th>
+                <td class="custom-td"><span data-sheets-root="1"><strong>${escapeHtml(data.maLopHocPhan)}</strong></span><br></td>
+            </tr>
+            <tr>
+                <th class="custom-th">Tên học phần</th>
+                <td class="custom-td"><span data-sheets-root="1"><strong>${escapeHtml(data.tenHocPhan)}</strong></span><br></td>
+            </tr>
+            <tr>
+                <th class="custom-th">Giảng viên</th>
+                <td class="custom-td"><strong>${escapeHtml(data.giangVien)}&nbsp;</strong></td>
+            </tr>
+            <tr>
+                <th class="custom-th">Thời gian học</th>
+                <td class="custom-td">${escapeHtml(data.thoiGianHoc)}</td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="custom-table">
+        <tbody>
+            <tr>
+                <td> </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="custom-table">
+        <tbody>
+            <tr>
+                <th class="custom-th" colspan="2">Mô tả khóa học</th>
+            </tr>
+            <tr>
+                <td class="custom-td" colspan="2">
+                    <div class="description-section">
+                        <strong>Tổng quan về nội dung môn học:</strong>
+                    </div>
+                    <div class="editor-indent" style="margin-left: 30px;">
+                        <div class="description-section">
+                            ${textToParagraphs(data.tongQuan)}
+                        </div>
+                    </div>
+                    <p><strong>Mục tiêu học tập:</strong>&nbsp;</p>
+                    <div class="editor-indent" style="margin-left: 30px;">
+                        ${textToBulletParagraphs(data.mucTieu)}
+                    </div>
+                    <p><strong>Yêu cầu đối với học viên:</strong>&nbsp;</p>
+                    <div class="editor-indent" style="margin-left: 30px;">
+                        ${textToBulletParagraphs(data.yeuCau)}
+                    </div>
+                    <p><strong>Phương pháp giảng dạy và đánh giá:</strong>&nbsp;</p>
+                    <div class="editor-indent" style="margin-left: 30px;">
+                        <div style="background-color: transparent;">
+                            ${textToBulletParagraphs(data.phuongPhap)}
+                        </div>
+                    </div>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <a id="Noi_dung_khoa_hoc"></a><a id="Nội_dung_khóa_học"></a><a id="Nộidungkhóahọc"></a>
+    <table class="custom-table">
+        <tbody>
+            <tr>
+
+                <th class="custom-th" colspan="2">Nội dung khóa học
+                </th>
+            </tr>
+            <tr>
+                <td class="custom-td" colspan="2">
+                    <div id="course-toc">
+                        <strong></strong>
+                        <ul id="toc-list"></ul>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="custom-table">
+        <tbody>
+            <tr>
+                <th class="custom-th" colspan="2">Tài nguyên và hỗ trợ</th>
+            </tr>
+            <tr>
+                <td class="custom-td" colspan="2">
+                    <p>📚&nbsp;<strong>Đề cương chi tiết học phần: </strong>Kế hoạch chi tiết quy định tổ chức các hoạt động học tập trong khóa học</p>
+                    <p><span><strong>📚&nbsp;</strong><strong style="font-weight: bold;">Hướng dẫn sử dụng: </strong>Hướng dẫn thực hiện các thao tác cơ bản trên khóa học dành cho học viên<br></span></p>
+                    <p>📌 <strong>Diễn đàn chung:</strong> Kênh trao đổi, hỗ trợ học viên trong suốt khóa học.</p>
+                    <p>💬 <strong>Diễn đàn thảo luận:</strong> Để xem và thảo luận các chủ đề liên quan đến nội dung của từng chương.</p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="custom-table">
+        <tbody>
+            <tr>
+                <th class="custom-th" colspan="2">Hỗ trợ</th>
+            </tr>
+            <tr>
+                <td class="custom-td" colspan="2">
+                    <p>🔧 <strong>GIảng viên hỗ trợ:</strong>&nbsp;${escapeHtml(data.giangVienHoTro)}</p>
+                    <p>📞 <strong>Hotline:</strong>&nbsp;${escapeHtml(data.hotline)}</p>
+                    <p>📧 <strong>Email: </strong>${escapeHtml(data.emailHoTro)} - <strong><a href="${escapeHtml(data.linkHoTro)}" target="_blank">Gửi yêu cầu hỗ trợ</a></strong></p>
+                    <p>💡 <strong>Hỗ trợ kỹ thuật và chuyên môn: <a href="${escapeHtml(data.linkHoTro)}" target="_blank">Gửi yêu cầu hỗ trợ</a></strong></p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="custom-table">
+        <tbody>
+            <tr>
+                <th class="custom-th" colspan="2">🗓️ Lịch học và thông báo</th>
+            </tr>
+            <tr>
+                <td class="custom-td" colspan="2">⏳ <strong>Thời gian kết thúc học phần:</strong> ${escapeHtml(data.ngayKetThuc)}</td>
+            </tr>
+            <tr>
+                <td class="custom-td" colspan="2">🎧 <strong>Phòng học:</strong>&nbsp;${escapeHtml(data.phongHoc)}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>`;
+
+            document.getElementById("output").textContent = finalHTML;
+        }
+
+        function copyHTML() {
+            const text = document.getElementById("output").textContent;
+            if (!text.trim()) {
+                alert("Bạn chưa xuất HTML.");
+                return;
+            }
+            navigator.clipboard.writeText(text)
+                .then(() => alert("Đã copy HTML."))
+                .catch(() => alert("Không copy được, hãy copy thủ công."));
+        }
+
+        generateHTML();
+    </script>
+</body>
+
+</html>
