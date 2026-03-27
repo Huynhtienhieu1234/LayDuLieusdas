@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo Câu Hỏi Ôn Tập</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e3a8a;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 8px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        textarea {
+            width: 100%;
+            height: 380px;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #2563eb;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background: #1e40af;
+        }
+
+        #output {
+            margin-top: 30px;
+        }
+
+        .preview {
+            margin-top: 25px;
+            border: 1px solid #ddd;
+            padding: 25px;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+
+        textarea#result {
+            width: 100%;
+            height: 460px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+
+        .success {
+            color: #10b981;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Nút cuộn */
+        .scroll-buttons {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .scroll-btn {
+            width: 50px;
+            height: 50px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scroll-btn:hover {
+            background: #1e40af;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .scroll-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>TẠO CÂU HỎI ÔN TẬP</h1>
+
+        <label>Nhập toàn bộ nội dung (tiêu đề chương + các câu hỏi):</label>
+        <textarea id="input"
+            placeholder="Dán toàn bộ nội dung vào đây...&#10;Ví dụ:&#10;CÂU HỎI ÔN TẬP CHƯƠNG 2&#10;&#10;Câu 1. Anh, chú hãy trình bày...&#10;Câu 2. Anh, chú hãy trình bày..."></textarea>
+
+        <button onclick="taoHTML()">Tạo HTML</button>
+
+        <div id="output"></div>
+        <div class="preview" id="preview"></div>
+    </div>
+
+    <div class="scroll-buttons">
+        <button class="scroll-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Cuộn lên đầu trang">↑</button>
+        <button class="scroll-btn" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" title="Cuộn xuống cuối trang">↓</button>
+    </div>
+
+    <script>
+        function taoHTML() {
+            const inputText = document.getElementById('input').value.trim();
+            if (!inputText) {
+                alert("Vui lòng nhập nội dung!");
+                return;
+            }
+
+            const lines = inputText.split('\n');
+            let title = "CÂU HỎI ÔN TẬP";
+            let questions = [];
+
+            lines.forEach(line => {
+                let trimmed = line.trim();
+                if (trimmed === '') return;
+
+                // Kiểm tra xem dòng này có phải là tiêu đề chương không
+                if (trimmed.toUpperCase().includes("CÂU HỎI ÔN TẬP")) {
+                    title = trimmed;
+                    return;
+                }
+
+                // Kiểm tra xem dòng này có bắt đầu bằng "Câu X." không
+                const questionMatch = trimmed.match(/^câu\s+\d+[\.\:\)]\s*(.*)/i);
+
+                if (questionMatch) {
+                    // Nếu là câu mới, thêm vào mảng
+                    let content = questionMatch[1].trim();
+                    if (content) questions.push(content);
+                    else questions.push(""); // Đề phòng trường hợp "Câu 1." rồi xuống dòng
+                } else {
+                    // Nếu không phải câu mới, nối vào câu cuối cùng đang xử lý
+                    if (questions.length > 0) {
+                        questions[questions.length - 1] += " " + trimmed;
+                    } else {
+                        // Trường hợp dòng đầu tiên không có chữ "Câu", coi như là câu 1
+                        questions.push(trimmed);
+                    }
+                }
+            });
+
+            // Làm sạch nội dung: loại bỏ khoảng trắng thừa do nối dòng
+            questions = questions.map(q => q.replace(/\s+/g, ' ').trim()).filter(q => q !== '');
+
+            if (questions.length === 0) {
+                alert("Không tìm thấy câu hỏi nào. Vui lòng kiểm tra lại nội dung!");
+                return;
+            }
+
+            // Tạo HTML
+            let html = `<div style="max-width:900px; margin:auto; font-family:Arial, sans-serif;">
+    <h1 style="text-align:center; font-size:28px; font-weight:bold; color:#1e3a8a; margin-bottom:30px;">
+        ${title}
+    </h1>
+`;
+
+            questions.forEach((cauhoi, index) => {
+                html += `    <div
+        style="background:#fff; border-radius:12px; padding:20px 25px; margin-bottom:20px; box-shadow:0 5px 15px rgba(0,0,0,0.08); border-left:6px solid #2563eb;">
+        <div
+            style="display:inline-block; background:#2563eb; color:#fff; padding:6px 12px; border-radius:20px; font-size:13px; font-weight:bold; margin-bottom:10px;">
+            CÂU HỎI ${index + 1}
+        </div>
+        <h2 style="font-size:18px; font-weight:600; color:#111827; line-height:1.5; margin:10px 0;">
+            ${cauhoi}
+        </h2>
+    </div>
+`;
+            });
+
+            html += `</div>`;
+
+            // Hiển thị kết quả
+            document.getElementById('output').innerHTML = `
+                <div class="success">✅ Đã tạo thành công ${questions.length} câu hỏi</div>
+                <textarea id="result" style="width:100%; height:460px; font-size:14px;">${html}</textarea>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="copyToClipboard()" style="margin-top:10px;">📋 Sao chép HTML</button>
+                    <button onclick="clearAll()" style="margin-top:10px; background: #6b7280;">🗑️ Xóa hết</button>
+                </div>
+            `;
+
+            // Preview
+            document.getElementById('preview').innerHTML = `
+                <strong>Xem trước:</strong><br><br>
+                ${html}
+            `;
+
+            // === Tự động cuộn xuống kết quả ===
+            setTimeout(() => {
+                document.getElementById('output').scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+            }, 100);
+        }
+
+        function clearAll() {
+            if (confirm("Bạn có chắc muốn xóa hết nội dung?")) {
+                document.getElementById('input').value = "";
+                document.getElementById('output').innerHTML = "";
+                document.getElementById('preview').innerHTML = "";
+                document.getElementById('input').focus();
+            }
+        }
+
+        function copyToClipboard() {
+            const textarea = document.getElementById('result');
+            if (textarea) {
+                textarea.select();
+                document.execCommand('copy');
+                alert("✅ Đã sao chép HTML vào clipboard!");
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tạo HTML Khóa Học</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        h2 { margin-bottom: 16px; color: #1e3a5f; font-size: 20px; }
+
+        .wrapper {
+            display: grid;
+            grid-template-columns: 440px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .panel {
+            background: #fff;
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .panel h3 { font-size: 15px; margin-bottom: 14px; color: #1e3a5f; }
+
+        /* ── Upload box ── */
+        .upload-box {
+            background: #eff6ff;
+            border: 2px dashed #93c5fd;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+        .upload-box .box-label {
+            font-weight: bold;
+            font-size: 13px;
+            color: #1e40af;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .upload-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .upload-row input[type="file"] {
+            flex: 1;
+            padding: 7px 10px;
+            font-size: 13px;
+            border: 1px solid #93c5fd;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            width: auto;
+        }
+        .btn-read {
+            flex: 0 0 auto;
+            background: #1e40af;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 9px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-read:hover { background: #1e3a8a; }
+
+        .upload-status {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #555;
+            min-height: 18px;
+        }
+        .upload-status.ok   { color: #16a34a; font-weight: bold; }
+        .upload-status.err  { color: #dc2626; font-weight: bold; }
+        .upload-status.busy { color: #2563eb; }
+
+        hr.divider { border: none; border-top: 1px solid #e5e7eb; margin: 14px 0; }
+
+        /* ── Form fields ── */
+        .form-group { margin-bottom: 11px; }
+
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 5px;
+            color: #374151;
+        }
+
+        input[type="text"], input:not([type]), textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13.5px;
+            font-family: inherit;
+            color: #111;
+            background: #fafafa;
+            transition: border-color 0.15s;
+            outline: none;
+        }
+        input:focus, textarea:focus {
+            border-color: #2563eb;
+            background: #fff;
+        }
+        textarea {
+            min-height: 86px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .hint { font-size: 11px; color: #9ca3af; margin-top: 3px; }
+
+        /* ── Section divider trong form ── */
+        .section-label {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #9ca3af;
+            margin: 14px 0 10px;
+        }
+
+        /* ── Buttons ── */
+        .action-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+
+        button {
+            padding: 9px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        .btn-primary { background: #2563eb; color: #fff; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #64748b; color: #fff; }
+        .btn-secondary:hover { background: #475569; }
+
+        /* ── Output panel ── */
+        .output-box {
+            white-space: pre-wrap;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 14px;
+            border-radius: 8px;
+            overflow: auto;
+            min-height: 400px;
+            max-height: 85vh;
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 12.5px;
+            line-height: 1.55;
+        }
+        .note { font-size: 12px; color: #6b7280; margin-bottom: 10px; }
+
+        @media (max-width: 860px) {
+            .wrapper { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<h2>📋 Công cụ nhập liệu và xuất HTML khóa học</h2>
+
+<div class="wrapper">
+
+    <!-- ═══ LEFT: FORM ═══ -->
+    <div class="panel">
+        <h3>Nhập thông tin</h3>
+
+        <!-- Upload docx -->
+        <div class="upload-box">
+            <span class="box-label">📂 Đọc từ file .docx — tự động điền 4 ô bên dưới</span>
+            <div class="upload-row">
+                <input type="file" id="docxFile" accept=".docx" />
+                <button class="btn-read" onclick="readDocx()">Đọc file</button>
+            </div>
+            <div class="upload-status" id="uploadStatus">Chọn file .docx rồi bấm "Đọc file"</div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Thông tin học phần -->
+        <div class="section-label">Thông tin học phần</div>
+
+        <div class="form-group">
+            <label>Mã học phần</label>
+            <input id="maHocPhan" value="LA4005">
+        </div>
+        <div class="form-group">
+            <label>Mã lớp học phần</label>
+            <input id="maLopHocPhan" value="TX-26T-LA4005-TEMPL">
+        </div>
+        <div class="form-group">
+            <label>Tên học phần</label>
+            <input id="tenHocPhan" value="Luật Hiến pháp">
+        </div>
+        <div class="form-group">
+            <label>Giảng viên</label>
+            <input id="giangVien" value="Th.S Võ Thị Minh Mẫn">
+        </div>
+        <div class="form-group">
+            <label>Thời gian học</label>
+            <input id="thoiGianHoc" value="Từ ngày 01/04/2026 đến ngày 30/06/2026">
+        </div>
+
+        <hr class="divider">
+
+        <!-- Mô tả khóa học — tự động điền từ docx -->
+        <div class="section-label">Mô tả khóa học <span style="color:#2563eb">(tự động điền từ file)</span></div>
+
+        <div class="form-group">
+            <label>Tổng quan về nội dung môn học</label>
+            <textarea id="tongQuan" rows="4">Môn học cung cấp những kiến thức nền tảng về Luật Hiến pháp, giúp người học hiểu rõ bản chất, vai trò của Hiến pháp, chế độ chính trị, tổ chức bộ máy nhà nước và quyền, nghĩa vụ cơ bản của công dân.</textarea>
+        </div>
+        <div class="form-group">
+            <label>Mục tiêu học tập</label>
+            <textarea id="mucTieu">Nắm được kiến thức cơ bản về Luật Hiến pháp.
+Hiểu nội dung các quy định hiến định quan trọng.
+Vận dụng kiến thức vào học tập và thực tiễn.</textarea>
+            <p class="hint">Mỗi mục tiêu một dòng</p>
+        </div>
+        <div class="form-group">
+            <label>Yêu cầu đối với học viên</label>
+            <textarea id="yeuCau">Tham gia đầy đủ các buổi học.
+Đọc tài liệu trước khi lên lớp.
+Tích cực trao đổi và thảo luận.</textarea>
+            <p class="hint">Mỗi yêu cầu một dòng</p>
+        </div>
+        <div class="form-group">
+            <label>Phương pháp giảng dạy và đánh giá</label>
+            <textarea id="phuongPhap">Kết hợp thuyết giảng, thảo luận và tự học có hướng dẫn.
+Đánh giá qua chuyên cần, kiểm tra thường xuyên và thi kết thúc học phần.</textarea>
+            <p class="hint">Mỗi phương pháp một dòng</p>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Hỗ trợ & lịch học -->
+        <div class="section-label">Hỗ trợ &amp; lịch học</div>
+
+        <div class="form-group">
+            <label>Giảng viên hỗ trợ</label>
+            <input id="giangVienHoTro" value="Th.S Võ Thị Minh Mẫn">
+        </div>
+        <div class="form-group">
+            <label>Hotline</label>
+            <input id="hotline" value="0900000000">
+        </div>
+        <div class="form-group">
+            <label>Email hỗ trợ</label>
+            <input id="emailHoTro" value="hotro@example.com">
+        </div>
+        <div class="form-group">
+            <label>Link gửi yêu cầu hỗ trợ</label>
+            <input id="linkHoTro" value="https://example.com/hotro">
+        </div>
+        <div class="form-group">
+            <label>Ngày kết thúc</label>
+            <input id="ngayKetThuc" value="30/06/2026">
+        </div>
+        <div class="form-group">
+            <label>Phòng học Google Meet</label>
+            <input id="phongHoc" value="https://meet.google.com/abc-defg-hij">
+        </div>
+
+        <div class="action-row">
+            <button class="btn-primary" onclick="generateHTML()">✦ Xuất HTML hoàn chỉnh</button>
+            <button class="btn-secondary" onclick="copyHTML()">Copy HTML</button>
+        </div>
+    </div>
+
+    <!-- ═══ RIGHT: OUTPUT ═══ -->
+    <div class="panel">
+        <h3>Kết quả HTML</h3>
+        <div class="note">Bấm "Xuất HTML hoàn chỉnh" để sinh đoạn HTML sẵn sàng dán vào hệ thống.</div>
+        <div id="output" class="output-box"></div>
+    </div>
+
+</div>
+
+<!-- mammoth.js: đọc .docx trong trình duyệt, không cần server -->
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   PHẦN 1 — ĐỌC FILE DOCX VÀ TRÍCH XUẤT (logic từ doc_extractor.py)
+════════════════════════════════════════════════════════════ */
+
+const PATTERNS = {
+    tongQuan: [
+        /lời giới thiệu/i,
+        /lời nói đầu/i,
+        /thông tin chung/i,
+        /tổng quan/i,
+        /giới thiệu môn/i,
+        /mô tả môn học/i,
+    ],
+    mucTieu: [
+        /mục tiêu/i,
+        /mục đích (học phần|môn học|bài giảng)/i,
+    ],
+    yeuCau: [
+        /yêu cầu (chung )?đối với (sinh|học) viên/i,
+        /yêu cầu chung/i,
+        /điều kiện (tham gia|tiên quyết)/i,
+    ],
+    phuongPhap: [
+        /kiểm tra và đánh giá/i,
+        /phương pháp đánh giá/i,
+        /hình thức (kiểm tra|đánh giá)/i,
+        /^5[\.\s].*đánh giá/i,
+    ],
+};
+
+const STOP = [
+    /^\d+[\.\d]*[\s\.]/,
+    /^chương \d/i,
+    /^(lời giới thiệu|mục lục|danh mục|phụ lục|tài liệu)/i,
+];
+
+function isStop(line) {
+    return STOP.some(p => p.test(line.trim()));
+}
+
+function matchesAny(line, patterns) {
+    return patterns.some(p => p.test(line.trim()));
+}
+
+const ALL_PATTERNS = Object.values(PATTERNS).flat();
+
+function extractAfter(lines, patterns, maxLines = 8) {
+    const result = [];
+    let capturing = false;
+    let count = 0;
+
+    for (const line of lines) {
+        const t = line.trim();
+        if (!t) continue;
+
+        if (matchesAny(t, patterns)) {
+            capturing = true;
+            count = 0;
+            const ci = t.indexOf(":");
+            if (ci !== -1) {
+                const after = t.slice(ci + 1).trim();
+                if (after.length > 15) { result.push(after); count++; }
+            }
+            continue;
+        }
+
+        if (capturing) {
+            if (count >= maxLines) break;
+            if (isStop(t) || matchesAny(t, ALL_PATTERNS)) break;
+            if (t.length < 6) continue;
+            result.push(t);
+            count++;
+        }
+    }
+    return result;
+}
+
+function extractSections(rawText) {
+    const lines = rawText.split("\n").map(l => l.trim()).filter(Boolean);
+
+    /* Tổng quan */
+    let tqLines = extractAfter(lines, PATTERNS.tongQuan, 5);
+    let tongQuan = tqLines.length
+        ? tqLines.join(" ")
+        : lines.slice(0, 40)
+            .filter(l => /tên (bài giảng|học phần|môn)/i.test(l) || /đối tượng|số tín chỉ|thời lượng/i.test(l))
+            .slice(0, 5).join(" | ");
+
+    /* Mục tiêu */
+    let mtLines = extractAfter(lines, PATTERNS.mucTieu, 8)
+        .filter(l => !(/^\d+\.\d+/.test(l) && /mục tiêu/i.test(l)))
+        .filter(l => !/^(mục tiêu chung|mục tiêu cụ thể)$/i.test(l))
+        .map(l => l.replace(/^[-–•]\s*/, ""));
+
+    /* Yêu cầu */
+    let ycLines = extractAfter(lines, PATTERNS.yeuCau, 6);
+    if (!ycLines.length) {
+        for (let i = 0; i < lines.length; i++) {
+            if (/yêu cầu/i.test(lines[i])) {
+                for (const l of lines.slice(i+1, i+8)) {
+                    const s = l.replace(/^[-–•+]\s*/, "").trim();
+                    if (s.length > 10) ycLines.push(s);
+                }
+                if (ycLines.length) break;
+            }
+        }
+    }
+    ycLines = ycLines.map(l => l.replace(/^[-–•]\s*/, ""));
+
+    /* Phương pháp */
+    let ppLines = extractAfter(lines, PATTERNS.phuongPhap, 7)
+        .filter(l => !(/^\d+\.\d+/.test(l) && l.length < 40));
+
+    return {
+        tongQuan:   tongQuan || "",
+        mucTieu:    mtLines.join("\n"),
+        yeuCau:     ycLines.join("\n"),
+        phuongPhap: ppLines.join("\n"),
+    };
+}
+
+function setStatus(msg, cls) {
+    const el = document.getElementById("uploadStatus");
+    el.textContent = msg;
+    el.className = "upload-status " + (cls || "");
+}
+
+async function readDocx() {
+    const fileInput = document.getElementById("docxFile");
+    const file = fileInput.files[0];
+    if (!file) { setStatus("⚠️  Chưa chọn file.", "err"); return; }
+    if (!file.name.endsWith(".docx")) { setStatus("⚠️  Chỉ hỗ trợ file .docx", "err"); return; }
+
+    setStatus("⏳  Đang đọc file...", "busy");
+
+    try {
+        const buf = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer: buf });
+        const extracted = extractSections(result.value);
+
+        if (extracted.tongQuan)   document.getElementById("tongQuan").value   = extracted.tongQuan;
+        if (extracted.mucTieu)    document.getElementById("mucTieu").value    = extracted.mucTieu;
+        if (extracted.yeuCau)     document.getElementById("yeuCau").value     = extracted.yeuCau;
+        if (extracted.phuongPhap) document.getElementById("phuongPhap").value = extracted.phuongPhap;
+
+        setStatus("✅  Đã đọc: " + file.name + " — 4 ô đã được điền tự động.", "ok");
+        generateHTML();
+    } catch (e) {
+        setStatus("❌  Lỗi: " + e.message, "err");
+    }
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   PHẦN 2 — XUẤT HTML (logic từ khoa_hoc_generator.html)
+════════════════════════════════════════════════════════════ */
+
+function escapeHtml(text) {
+    return String(text || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+function textToParagraphs(text) {
+    const lines = String(text || "").split("\n").map(l => l.trim()).filter(Boolean);
+    if (!lines.length) return "<p></p>";
+    return lines.map(l => `<p>${escapeHtml(l)}</p>`).join("\n");
+}
+
+function textToBulletParagraphs(text) {
+    const lines = String(text || "").split("\n").map(l => l.trim()).filter(Boolean);
+    if (!lines.length) return "<p>• </p>";
+    return lines.map(l => `<p>• ${escapeHtml(l)}</p>`).join("\n");
+}
+
+function generateHTML() {
+    const v = id => document.getElementById(id).value;
+    const d = {
+        maHocPhan:      v("maHocPhan"),
+        maLopHocPhan:   v("maLopHocPhan"),
+        tenHocPhan:     v("tenHocPhan"),
+        giangVien:      v("giangVien"),
+        thoiGianHoc:    v("thoiGianHoc"),
+        tongQuan:       v("tongQuan"),
+        mucTieu:        v("mucTieu"),
+        yeuCau:         v("yeuCau"),
+        phuongPhap:     v("phuongPhap"),
+        giangVienHoTro: v("giangVienHoTro"),
+        hotline:        v("hotline"),
+        emailHoTro:     v("emailHoTro"),
+        linkHoTro:      v("linkHoTro"),
+        ngayKetThuc:    v("ngayKetThuc"),
+        phongHoc:       v("phongHoc"),
+    };
+
+    const html = `<div class="container">
+    <h5>Thông Tin Khóa Học</h5>
+    <table class="custom-table">
+        <tbody>
+            <tr>
+                <th class="custom-th">Mã học phần</th>
+                <td class="custom-td"><span data-sheets-root="1"><strong>${escapeHtml(d.maHocPhan)}</strong></span><br></td>
+            </tr>
+            <tr>
+                <th class="custom-th">Mã lớp học phần</th>
+                <td class="custom-td"><span data-sheets-root="1"><strong>${escapeHtml(d.maLopHocPhan)}</strong></span><br></td>
+            </tr>
+            <tr>
+                <th class="custom-th">Tên học phần</th>
+                <td class="custom-td"><span data-sheets-root="1"><strong>${escapeHtml(d.tenHocPhan)}</strong></span><br></td>
+            </tr>
+            <tr>
+                <th class="custom-th">Giảng viên</th>
+                <td class="custom-td"><strong>${escapeHtml(d.giangVien)}&nbsp;</strong></td>
+            </tr>
+            <tr>
+                <th class="custom-th">Thời gian học</th>
+                <td class="custom-td">${escapeHtml(d.thoiGianHoc)}</td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="custom-table">
+        <tbody>
+            <tr><td> </td></tr>
+        </tbody>
+    </table>
+    <table class="custom-table">
+        <tbody>
+            <tr>
+                <th class="custom-th" colspan="2">Mô tả khóa học</th>
+            </tr>
+            <tr>
+                <td class="custom-td" colspan="2">
+                    <div class="description-section">
+                        <strong>Tổng quan về nội dung môn học:</strong>
+                    </div>
+                    <div class="editor-indent" style="margin-left: 30px;">
+                        <div class="description-section">
+                            ${textToParagraphs(d.tongQuan)}
+                        </div>
+                    </div>
+                    <p><strong>Mục tiêu học tập:</strong>&nbsp;</p>
+                    <div class="editor-indent" style="margin-left: 30px;">
+                        ${textToBulletParagraphs(d.mucTieu)}
+                    </div>
+                    <p><strong>Yêu cầu đối với học viên:</strong>&nbsp;</p>
+                    <div class="editor-indent" style="margin-left: 30px;">
+                        ${textToBulletParagraphs(d.yeuCau)}
+                    </div>
+                    <p><strong>Phương pháp giảng dạy và đánh giá:</strong>&nbsp;</p>
+                    <div class="editor-indent" style="margin-left: 30px;">
+                        <div style="background-color: transparent;">
+                            ${textToBulletParagraphs(d.phuongPhap)}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <a id="Noi_dung_khoa_hoc"></a><a id="Nội_dung_khóa_học"></a><a id="Nộidungkhóahọc"></a>
+    <table class="custom-table">
+        <tbody>
+            <tr>
+                <th class="custom-th" colspan="2">Nội dung khóa học</th>
+            </tr>
+            <tr>
+                <td class="custom-td" colspan="2">
+                    <div id="course-toc">
+                        <strong></strong>
+                        <ul id="toc-list"></ul>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="custom-table">
+        <tbody>
+            <tr>
+                <th class="custom-th" colspan="2">Tài nguyên và hỗ trợ</th>
+            </tr>
+            <tr>
+                <td class="custom-td" colspan="2">
+                    <p>📚&nbsp;<strong>Đề cương chi tiết học phần: </strong>Kế hoạch chi tiết quy định tổ chức các hoạt động học tập trong khóa học</p>
+                    <p><span><strong>📚&nbsp;</strong><strong style="font-weight: bold;">Hướng dẫn sử dụng: </strong>Hướng dẫn thực hiện các thao tác cơ bản trên khóa học dành cho học viên<br></span></p>
+                    <p>📌 <strong>Diễn đàn chung:</strong> Kênh trao đổi, hỗ trợ học viên trong suốt khóa học.</p>
+                    <p>💬 <strong>Diễn đàn thảo luận:</strong> Để xem và thảo luận các chủ đề liên quan đến nội dung của từng chương.</p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="custom-table">
+        <tbody>
+            <tr>
+                <th class="custom-th" colspan="2">Hỗ trợ</th>
+            </tr>
+            <tr>
+                <td class="custom-td" colspan="2">
+                    <p>🔧 <strong>GIảng viên hỗ trợ:</strong>&nbsp;${escapeHtml(d.giangVienHoTro)}</p>
+                    <p>📞 <strong>Hotline:</strong>&nbsp;${escapeHtml(d.hotline)}</p>
+                    <p>📧 <strong>Email: </strong>${escapeHtml(d.emailHoTro)} - <strong><a href="${escapeHtml(d.linkHoTro)}" target="_blank">Gửi yêu cầu hỗ trợ</a></strong></p>
+                    <p>💡 <strong>Hỗ trợ kỹ thuật và chuyên môn: <a href="${escapeHtml(d.linkHoTro)}" target="_blank">Gửi yêu cầu hỗ trợ</a></strong></p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="custom-table">
+        <tbody>
+            <tr>
+                <th class="custom-th" colspan="2">🗓️ Lịch học và thông báo</th>
+            </tr>
+            <tr>
+                <td class="custom-td" colspan="2">⏳ <strong>Thời gian kết thúc học phần:</strong> ${escapeHtml(d.ngayKetThuc)}</td>
+            </tr>
+            <tr>
+                <td class="custom-td" colspan="2">🎧 <strong>Phòng học:</strong>&nbsp;${escapeHtml(d.phongHoc)}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>`;
+
+    document.getElementById("output").textContent = html;
+}
+
+function copyHTML() {
+    const text = document.getElementById("output").textContent;
+    if (!text.trim()) { alert("Bạn chưa xuất HTML."); return; }
+    navigator.clipboard.writeText(text)
+        .then(() => alert("✅ Đã copy HTML vào clipboard."))
+        .catch(() => alert("Không copy được, hãy copy thủ công."));
+}
+
+// Xuất HTML mặc định khi tải trang
+generateHTML();
+</script>
+
+</body>
+</html>
