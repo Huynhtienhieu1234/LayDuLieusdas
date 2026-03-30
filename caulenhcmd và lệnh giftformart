@@ -11,5 +11,4 @@ $word.Quit()
 chuyển file này thành gift formart chương 1 câu 1 là 01 .1 câu 2 là 01.2 chương 2 câu 1 là 02.1 câu 2 là 02.2
 Xuất full tất cả các chương (hiện mình mới làm mẫu chương 1–2)
 // Câu cho bài kiểm tra giữa kỳ 
-chuyển file này thành gift formart cấu trúc câu 1 là GK_Cau1
-xuất ra file luôn 
+chuyển file này thành gift formart cấu trúc câu 1 là GK_Cau1 Xuất file .txt chuẩn GIFT
