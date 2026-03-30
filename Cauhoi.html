@@ -125,7 +125,7 @@
 </head>
 
 <body>
-    
+
     <div class="container">
         <h1>TẠO CÂU HỎI ÔN TẬP</h1>
         <label>Nhập toàn bộ nội dung (tiêu đề chương + các câu hỏi):</label>
@@ -138,8 +138,10 @@
     </div>
 
     <div class="scroll-buttons">
-        <button class="scroll-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Cuộn lên đầu trang">↑</button>
-        <button class="scroll-btn" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" title="Cuộn xuống cuối trang">↓</button>
+        <button class="scroll-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+            title="Cuộn lên đầu trang">↑</button>
+        <button class="scroll-btn" onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})"
+            title="Cuộn xuống cuối trang">↓</button>
     </div>
 
     <script>
@@ -173,18 +175,19 @@
                     if (content) questions.push(content);
                     else questions.push(""); // Đề phòng trường hợp "Câu 1." rồi xuống dòng
                 } else {
-                    // Nếu không phải câu mới, nối vào câu cuối cùng đang xử lý
                     if (questions.length > 0) {
-                        questions[questions.length - 1] += " " + trimmed;
+                        // Dòng có '-' hoặc nối tiếp → gộp vào câu hiện tại, xuống dòng
+                        questions[questions.length - 1] += "\n" + trimmed;
                     } else {
-                        // Trường hợp dòng đầu tiên không có chữ "Câu", coi như là câu 1
                         questions.push(trimmed);
                     }
                 }
             });
 
-            // Làm sạch nội dung: loại bỏ khoảng trắng thừa do nối dòng
-            questions = questions.map(q => q.replace(/\s+/g, ' ').trim()).filter(q => q !== '');
+            // Làm sạch nội dung: trim từng dòng riêng, giữ nguyên xuống dòng
+            questions = questions.map(q =>
+                q.split('\n').map(line => line.trim()).join('\n').trim()
+            ).filter(q => q !== '');
 
             if (questions.length === 0) {
                 alert("Không tìm thấy câu hỏi nào. Vui lòng kiểm tra lại nội dung!");
@@ -205,9 +208,7 @@
             style="display:inline-block; background:#2563eb; color:#fff; padding:6px 12px; border-radius:20px; font-size:13px; font-weight:bold; margin-bottom:10px;">
             CÂU HỎI ${index + 1}
         </div>
-        <h2 style="font-size:18px; font-weight:600; color:#111827; line-height:1.5; margin:10px 0;">
-            ${cauhoi}
-        </h2>
+        <h2 style="font-size:18px; font-weight:600; color:#111827; line-height:1.5; margin:10px 0; white-space:pre-line;">${cauhoi}</h2>
     </div>
 `;
             });
