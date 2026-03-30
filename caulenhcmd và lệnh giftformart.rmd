@@ -12,3 +12,5 @@ chuyển file này thành gift formart chương 1 câu 1 là 01 .1 câu 2 là 01
 Xuất full tất cả các chương (hiện mình mới làm mẫu chương 1–2)
 // Câu cho bài kiểm tra giữa kỳ 
 chuyển file này thành gift formart cấu trúc câu 1 là GK_Cau1 Xuất file .txt chuẩn GIFT
+// Câu lệnh tách chương
+tách thành các chương riêng lẻ lặp lại trang bìa, lời giới thiệu, mục lục,DANH MỤC TỪ NGỮ VIẾT TẮT, tài liệu tham khảo, cho mỗi chương, trang trắng thì bỏ ra
