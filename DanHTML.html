@@ -243,11 +243,12 @@
             <div class="form-group">
                 <label>Yêu cầu đối với học viên</label>
                 <textarea id="yeuCau" rows="3" style="background:#f0fdf4; color:#166534; border-color:#bbf7d0;">Chủ động nghiên cứu tài liệu trên hệ thống
-Hoàn thành các bài kiểm tra đầy đủ</textarea>
+                    Hoàn thành các bài kiểm tra đầy đủ</textarea>
             </div>
             <div class="form-group">
                 <label>Phương pháp giảng dạy và đánh giá <span class="hint">(mỗi nội dung một dòng)</span></label>
-                <textarea id="phuongPhap" rows="7"></textarea>
+                <textarea id="phuongPhap" rows="7">Giao người học nhiệm vụ tự đọc tài liệu và làm bài trắc nghiệm ôn tập sau mỗi chương. Giải đáp thắc mắc.
+Đánh giá qua 01 bài kiểm tra trắc nghiệm giữa kỳ (10 câu) và 1 bài thi tự luận tập trung kết thúc học phần.</textarea>
             </div>
 
             <div class="form-group">
@@ -372,7 +373,8 @@ Hoàn thành các bài kiểm tra đầy đủ</textarea>
 
         function textToBulletParagraphs(text) {
             const lines = String(text || "").split("\n").map(l => l.trim()).filter(Boolean);
-            return lines.length ? lines.map(l => `<p>• ${escapeHtml(l)}</p>`).join("\n") : "<p>• </p>";
+            // Sử dụng style text-indent âm để gạch đầu dòng sát lề và căn lề dòng thứ 2 thẳng hàng với văn bản
+            return lines.length ? lines.map(l => `<p style="margin-bottom: 5px; text-indent: -15px; padding-left: 15px;">- ${escapeHtml(l)}</p>`).join("\n") : "<p>- </p>";
         }
 
         function generateHTML() {
@@ -398,11 +400,11 @@ Hoàn thành các bài kiểm tra đầy đủ</textarea>
                     <div class="description-section"><strong>Tổng quan về nội dung môn học:</strong></div>
                     <div class="description-section">${v("tongQuan").split("\n").map(p => `<p>${escapeHtml(p)}</p>`).join("")}</div>
                     <p><strong>Mục tiêu học tập:</strong>&nbsp;</p>
-                    <div style="margin-left:30px;">${textToBulletParagraphs(v("mucTieu"))}</div>
+                    <div style="margin-left:20px;">${textToBulletParagraphs(v("mucTieu"))}</div>
                     <p><strong>Yêu cầu đối với học viên:</strong>&nbsp;</p>
-                    <div style="margin-left:30px;">${textToBulletParagraphs(v("yeuCau"))}</div>
+                    <div style="margin-left:20px;">${textToBulletParagraphs(v("yeuCau"))}</div>
                     <p><strong>Phương pháp giảng dạy và đánh giá:</strong>&nbsp;</p>
-                    <div style="margin-left:30px;">${textToBulletParagraphs(v("phuongPhap"))}</div>
+                    <div style="margin-left:20px;">${textToBulletParagraphs(v("phuongPhap"))}</div>
                 </td>
             </tr>
         </tbody>
@@ -471,6 +473,7 @@ Hoàn thành các bài kiểm tra đầy đủ</textarea>
             document.getElementById("thoiGianHoc").value = "[Từ ngày... đến ngày...]";
             document.getElementById("phongHoc").value = "https://meet.google.com/tzb-ixdv-tuh";
             document.getElementById("yeuCau").value = "Chủ động nghiên cứu tài liệu trên hệ thống\nHoàn thành các bài kiểm tra đầy đủ";
+            document.getElementById("phuongPhap").value = "Giao người học nhiệm vụ tự đọc tài liệu và làm bài trắc nghiệm ôn tập sau mỗi chương. Giải đáp thắc mắc.\nĐánh giá qua 01 bài kiểm tra trắc nghiệm giữa kỳ (10 câu) và 1 bài thi tự luận tập trung kết thúc học phần.";
             generateHTML();
         };
     </script>
