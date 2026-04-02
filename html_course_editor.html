@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Công cụ HTML khóa học</title>
+
+<style>
+body { font-family: Arial; background:#f3f4f6; padding:20px }
+.wrapper { display:grid; grid-template-columns:460px 1fr; gap:20px }
+.panel { background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1) }
+
+textarea,input { width:100%; padding:10px; margin-top:5px; border-radius:6px; border:1px solid #ccc }
+button { padding:10px; margin-top:10px; cursor:pointer; border:none; border-radius:6px }
+
+.btn-primary { background:#2563eb; color:#fff }
+.btn-secondary { background:#64748b; color:#fff }
+
+.output { background:#0f172a; color:#e2e8f0; padding:15px; white-space:pre-wrap; min-height:400px }
+
+#toast {
+ position:fixed; bottom:20px; right:20px;
+ background:#16a34a; color:#fff;
+ padding:12px 16px; border-radius:8px;
+ display:none;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📋 Tool HTML khóa học</h2>
+
+<div class="wrapper">
+
+<div class="panel">
+<textarea id="inputHTML" placeholder="Dán HTML vào đây"></textarea>
+<button class="btn-primary" onclick="parseHTML()">Phân tích HTML</button>
+
+<hr>
+
+<input id="maHocPhan" placeholder="Mã học phần">
+<input id="maLopHocPhan" placeholder="Mã lớp">
+<input id="tenHocPhan" placeholder="Tên học phần">
+<input id="giangVien" placeholder="Giảng viên">
+<input id="thoiGianHoc" placeholder="Thời gian">
+
+<textarea id="tongQuan" placeholder="Tổng quan"></textarea>
+<textarea id="mucTieu" placeholder="Mục tiêu (mỗi dòng 1 mục)"></textarea>
+<textarea id="yeuCau"></textarea>
+<textarea id="phuongPhap"></textarea>
+
+<input id="phongHoc">
+
+<button class="btn-primary" onclick="generateHTML()">Xuất HTML</button>
+<button class="btn-secondary" onclick="copyHTML()">Copy</button>
+</div>
+
+<div class="panel">
+<div id="output" class="output"></div>
+</div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+
+// ===== utils =====
+const $ = id => document.getElementById(id)
+
+function toast(msg){
+  const t = $("toast")
+  t.innerText = msg
+  t.style.display = "block"
+  setTimeout(()=>t.style.display="none",2000)
+}
+
+function escapeHtml(text){
+  return String(text||"")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+}
+
+function linesToHTML(text){
+  return text.split("\n")
+    .map(l=>l.trim())
+    .filter(Boolean)
+    .map(l=>`<p>• ${escapeHtml(l)}</p>`)
+    .join("")
+}
+
+// ===== parse =====
+function parseHTML(){
+  const raw = $("inputHTML").value.trim()
+  if(!raw) return alert("Dán HTML trước!")
+
+  try{
+    const doc = new DOMParser().parseFromString(raw,"text/html")
+
+    const get = label=>{
+      const th = [...doc.querySelectorAll("th")]
+        .find(x=>x.textContent.trim()===label)
+      return th?.closest("tr")?.querySelector("td")?.textContent.trim() || ""
+    }
+
+    $("maHocPhan").value = get("Mã học phần")
+    $("maLopHocPhan").value = get("Mã lớp học phần")
+    $("tenHocPhan").value = get("Tên học phần")
+    $("giangVien").value = get("Giảng viên")
+    $("thoiGianHoc").value = get("Thời gian học")
+
+    // phòng học
+    const phong = doc.body.textContent.match(/https:\/\/meet\.google\.com\/[^\s]+/)
+    $("phongHoc").value = phong ? phong[0] : ""
+
+    // list parser
+    const getList = keyword=>{
+      const html = doc.body.innerHTML
+      const idx = html.indexOf(keyword)
+      if(idx===-1) return ""
+      const sub = html.substring(idx)
+      const match = sub.match(/<ul[^>]*>([\s\S]*?)<\/ul>/i)
+      if(!match) return ""
+      const temp = document.createElement("div")
+      temp.innerHTML = match[0]
+      return [...temp.querySelectorAll("li")]
+        .map(li=>li.textContent.trim())
+        .join("\n")
+    }
+
+    $("mucTieu").value = getList("Mục tiêu")
+    $("yeuCau").value = getList("Yêu cầu")
+    $("phuongPhap").value = getList("Phương pháp")
+
+    toast("Parse thành công")
+    generateHTML()
+
+  }catch(e){
+    console.error(e)
+    alert("Lỗi parse HTML")
+  }
+}
+
+// ===== generate =====
+function generateHTML(){
+  const v = id => escapeHtml($(id).value)
+
+  const html = `
+<div class="container">
+<table>
+<tr><th>Mã học phần</th><td>${v("maHocPhan")}</td></tr>
+<tr><th>Mã lớp</th><td>${v("maLopHocPhan")}</td></tr>
+<tr><th>Tên</th><td>${v("tenHocPhan")}</td></tr>
+<tr><th>GV</th><td>${v("giangVien")}</td></tr>
+<tr><th>Thời gian</th><td>${v("thoiGianHoc")}</td></tr>
+</table>
+
+<h4>Tổng quan</h4>
+${linesToHTML($("tongQuan").value)}
+
+<h4>Mục tiêu</h4>
+${linesToHTML($("mucTieu").value)}
+
+<h4>Yêu cầu</h4>
+${linesToHTML($("yeuCau").value)}
+
+<h4>Phương pháp</h4>
+${linesToHTML($("phuongPhap").value)}
+
+<p>🎧 ${v("phongHoc")}</p>
+
+</div>
+`
+
+  $("output").textContent = html
+}
+
+// ===== copy =====
+function copyHTML(){
+  const text = $("output").textContent
+  if(!text) return
+  navigator.clipboard.writeText(text)
+  toast("Đã copy")
+}
+
+// init
+window.onload = ()=>{
+  $("phongHoc").value = "https://meet.google.com/tzb-ixdv-tuh"
+  generateHTML()
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tạo & Chỉnh Sửa HTML Khóa Học</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 16px;
+            color: #1e3a5f;
+            font-size: 22px;
+        }
+
+        .wrapper {
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: #1e3a5f;
+        }
+
+        .upload-box {
+            background: #eff6ff;
+            border: 2px dashed #93c5fd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        textarea#inputHTML {
+            width: 100%;
+            min-height: 140px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            padding: 10px;
+            border: 1px solid #93c5fd;
+            border-radius: 6px;
+        }
+
+        .btn-parse {
+            margin-top: 10px;
+            width: 100%;
+            background: #1e40af;
+            color: #fff;
+            border: none;
+            padding: 11px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-parse:hover {
+            background: #1e3a8a;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 13.5px;
+            margin-bottom: 6px;
+            color: #374151;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #2563eb;
+            background: #fff;
+        }
+
+        textarea {
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .hint {
+            font-size: 11.5px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .output-box {
+            white-space: pre-wrap;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            overflow: auto;
+            min-height: 500px;
+            max-height: 88vh;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .note {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 12px;
+        }
+
+        /* Toast thông báo */
+        #successToast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #16a34a;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>📋 Công cụ Tạo & Chỉnh Sửa HTML Khóa Học</h2>
+
+    <div class="wrapper">
+        <div class="panel">
+            <h3>Nhập / Chỉnh sửa thông tin</h3>
+
+            <div class="upload-box">
+                <span class="box-label">📋 Dán HTML khóa học hiện có để tự động điền form</span>
+                <textarea id="inputHTML"
+                    placeholder="Dán toàn bộ đoạn HTML từ <div class='container'> đến </div> vào đây..."></textarea>
+                <button class="btn-parse" onclick="parseAndFillHTML()">🔄 Phân tích HTML & Điền tự động vào
+                    form</button>
+                <div id="htmlStatus" style="margin-top:10px; font-size:13px;"></div>
+            </div>
+
+            <hr style="border-top:1px solid #e5e7eb; margin:18px 0;">
+
+            <div class="section-label">Thông tin học phần</div>
+            <div class="form-group"><label>Mã học phần</label><input id="maHocPhan"></div>
+            <div class="form-group"><label>Mã lớp học phần</label><input id="maLopHocPhan"></div>
+            <div class="form-group"><label>Tên học phần</label><input id="tenHocPhan"></div>
+            <div class="form-group"><label>Giảng viên</label><input id="giangVien"></div>
+            <div class="form-group">
+                <label>Thời gian học</label>
+                <input id="thoiGianHoc" value="[Từ ngày... đến ngày...]" readonly style="background: #f3f4f6;">
+            </div>
+
+            <hr style="border-top:1px solid #e5e7eb; margin:18px 0;">
+
+            <div class="section-label">Mô tả khóa học</div>
+            <div class="form-group">
+                <label>Tổng quan về nội dung môn học</label>
+                <textarea id="tongQuan" rows="7"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Mục tiêu học tập <span class="hint">(mỗi mục tiêu một dòng)</span></label>
+                <textarea id="mucTieu" rows="5"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Yêu cầu đối với học viên</label>
+                <textarea id="yeuCau" rows="3" style="background:#f0fdf4; color:#166534;"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Phương pháp giảng dạy và đánh giá <span class="hint">(mỗi nội dung một dòng)</span></label>
+                <textarea id="phuongPhap" rows="7"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Phòng học Google Meet</label>
+                <input id="phongHoc" value="https://meet.google.com/tzb-ixdv-tuh" readonly style="background: #f3f4f6;">
+            </div>
+
+            <div class="action-row">
+                <button class="btn-primary" onclick="generateHTML()">✦ Xuất / Cập nhật HTML hoàn chỉnh</button>
+                <button class="btn-secondary" onclick="copyHTML()">📋 Copy HTML</button>
+                <button class="btn-secondary" onclick="clearForm()" style="background:#f59e0b;color:#fff;">🗑️ Xóa
+                    form</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>Kết quả HTML</h3>
+            <div class="note">Dán HTML → bấm nút phân tích → chỉnh sửa → xuất HTML</div>
+            <div id="output" class="output-box"></div>
+        </div>
+    </div>
+
+    <!-- Toast thông báo thành công -->
+    <div id="successToast">
+        ✅ <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        function setStatus(msg, color = "#2563eb") {
+            const el = document.getElementById("htmlStatus");
+            el.textContent = msg;
+            el.style.color = color;
+        }
+
+        function showSuccess(message) {
+            const toast = document.getElementById("successToast");
+            const toastMsg = document.getElementById("toastMessage");
+            toastMsg.textContent = message;
+            toast.style.display = "flex";
+            setTimeout(() => { toast.style.display = "none"; }, 3000);
+        }
+
+        function parseAndFillHTML() {
+            const pasted = document.getElementById("inputHTML").value.trim();
+            if (!pasted) {
+                setStatus("⚠️ Vui lòng dán HTML trước!", "#dc2626");
+                return;
+            }
+
+            setStatus("⏳ Đang phân tích...", "#2563eb");
+
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(pasted, "text/html");
+
+                const getCell = (label) => {
+                    const th = Array.from(doc.querySelectorAll("th")).find(t => t.textContent.trim() === label);
+                    return th ? th.closest("tr").querySelector("td").textContent.trim().replace(/\u00A0/g, " ").trim() : "";
+                };
+
+                document.getElementById("maHocPhan").value = getCell("Mã học phần");
+                document.getElementById("maLopHocPhan").value = getCell("Mã lớp học phần");
+                document.getElementById("tenHocPhan").value = getCell("Tên học phần");
+                document.getElementById("giangVien").value = getCell("Giảng viên");
+                document.getElementById("thoiGianHoc").value = "[Từ ngày... đến ngày...]";
+                document.getElementById("phongHoc").value = "https://meet.google.com/tzb-ixdv-tuh";
+
+                // Phần mô tả khóa học (giữ nguyên logic cũ)
+                const moTaTd = Array.from(doc.querySelectorAll("td[colspan='2']")).find(td =>
+                    td.closest("table") && td.closest("table").querySelector("th")?.textContent.includes("Mô tả khóa học")
+                );
+
+                if (moTaTd) {
+                    const htmlContent = moTaTd.innerHTML;
+
+                    const extractSection = (headerText, nextHeaderText = null) => {
+                        let startIndex = htmlContent.indexOf(headerText);
+                        if (startIndex === -1) return "";
+
+                        let after = htmlContent.substring(startIndex + headerText.length);
+                        let endIndex = nextHeaderText ? after.indexOf(nextHeaderText) : -1;
+                        let sectionHtml = endIndex > -1 ? after.substring(0, endIndex) : after;
+
+                        const temp = document.createElement("div");
+                        temp.innerHTML = sectionHtml;
+
+                        // Lấy tất cả li hoặc p, loại bỏ các dấu đầu dòng
+                        let items = Array.from(temp.querySelectorAll("li, p")).map(el =>
+                            el.textContent.trim().replace(/^[\u2022\u00B7\-]|\s*•\s*/g, "").trim()
+                        ).filter(Boolean);
+
+                        return items.join("\n");
+                    };
+
+                    // Tổng quan
+                    document.getElementById("tongQuan").value = extractSection("Tổng quan về nội dung môn học:", "Mục tiêu học tập:");
+
+                    // Mục tiêu
+                    document.getElementById("mucTieu").value = extractSection("Mục tiêu học tập:", "Yêu cầu đối với học viên:");
+
+                    // Yêu cầu
+                    let yeuCau = extractSection("Yêu cầu đối với học viên:", "Phương pháp giảng dạy và đánh giá:");
+                    document.getElementById("yeuCau").value = yeuCau || "Tham gia đầy đủ hoàn thành các bài tập và bài kiểm tra và thi trực tiếp tại trường";
+
+                    // Phương pháp
+                    document.getElementById("phuongPhap").value = extractSection("Phương pháp giảng dạy và đánh giá:", "Nội dung khóa học");
+                }
+
+                setStatus("✅ Phân tích thành công!", "#16a34a");
+                generateHTML();
+                showSuccess("Đã chuyển đổi và điền thông tin thành công!");
+
+            } catch (e) {
+                console.error(e);
+                setStatus("❌ Lỗi phân tích HTML. Hãy thử dán lại.", "#dc2626");
+            }
+        }
+
+        function escapeHtml(text) {
+            return String(text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
+        function textToBulletParagraphs(text) {
+            const lines = String(text || "").split("\n").map(l => l.trim()).filter(Boolean);
+            return lines.length ? lines.map(l => `<p>• ${escapeHtml(l)}</p>`).join("\n") : "<p>• </p>";
+        }
+
+        function generateHTML() {
+            const v = id => document.getElementById(id).value.trim();
+
+            const html = `<div class="container">
+    <h5>Thông Tin Khóa Học</h5>
+    <table class="custom-table">
+        <tbody>
+            <tr><th class="custom-th">Mã học phần</th><td class="custom-td"><strong>${escapeHtml(v("maHocPhan"))}</strong></td></tr>
+            <tr><th class="custom-th">Mã lớp học phần</th><td class="custom-td"><strong>${escapeHtml(v("maLopHocPhan"))}</strong></td></tr>
+            <tr><th class="custom-th">Tên học phần</th><td class="custom-td"><strong>${escapeHtml(v("tenHocPhan"))}</strong><br></td></tr>
+            <tr><th class="custom-th">Giảng viên</th><td class="custom-td"><strong>${escapeHtml(v("giangVien"))}&nbsp;</strong></td></tr>
+            <tr><th class="custom-th">Thời gian học</th><td class="custom-td">${escapeHtml(v("thoiGianHoc"))}</td></tr>
+        </tbody>
+    </table>
+    <table class="custom-table"><tbody><tr><td> </td></tr></tbody></table>
+    <table class="custom-table">
+        <tbody>
+            <tr><th class="custom-th" colspan="2">Mô tả khóa học</th></tr>
+            <tr>
+                <td class="custom-td" colspan="2">
+                    <div class="description-section"><strong>Tổng quan về nội dung môn học:</strong></div>
+                    <div class="description-section">${v("tongQuan").split("\n").map(p => `<p>${escapeHtml(p)}</p>`).join("")}</div>
+                    <p><strong>Mục tiêu học tập:</strong>&nbsp;</p>
+                    <div style="margin-left:30px;">${textToBulletParagraphs(v("mucTieu"))}</div>
+                    <p><strong>Yêu cầu đối với học viên:</strong>&nbsp;</p>
+                    <div style="margin-left:30px;">${textToBulletParagraphs(v("yeuCau"))}</div>
+                    <p><strong>Phương pháp giảng dạy và đánh giá:</strong>&nbsp;</p>
+                    <div style="margin-left:30px;">${textToBulletParagraphs(v("phuongPhap"))}</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <a id="Noi_dung_khoa_hoc"></a><a id="Nội_dung_khóa_học"></a><a id="Nộidungkhóahọc"></a>
+    <table class="custom-table">
+        <tbody><tr><th class="custom-th" colspan="2">Nội dung khóa học</th></tr>
+        <tr><td class="custom-td" colspan="2"><div id="course-toc"><strong></strong><ul id="toc-list"></ul></div></td></tr></tbody>
+    </table>
+    <table class="custom-table">
+        <tbody>
+            <tr><th class="custom-th" colspan="2">Tài nguyên và hỗ trợ</th></tr>
+            <tr><td class="custom-td" colspan="2">
+                <p>📚&nbsp;<strong>Đề cương chi tiết học phần: </strong>Kế hoạch chi tiết quy định tổ chức các hoạt động học tập trong khóa học</p>
+                <p><strong>📚&nbsp;</strong><strong>Hướng dẫn sử dụng: </strong>Hướng dẫn thực hiện các thao tác cơ bản trên khóa học dành cho học viên</p>
+                <p>📌 <strong>Diễn đàn chung:</strong> Kênh trao đổi, hỗ trợ học viên trong suốt khóa học.</p>
+                <p>💬 <strong>Diễn đàn thảo luận:</strong> Để xem và thảo luận các chủ đề liên quan đến nội dung của từng chương.</p>
+            </td></tr>
+        </tbody>
+    </table>
+    <table class="custom-table">
+        <tbody>
+            <tr><th class="custom-th" colspan="2">Hỗ trợ</th></tr>
+            <tr><td class="custom-td" colspan="2">
+                <p>🔧 <strong>Giảng viên hỗ trợ:</strong>&nbsp;${escapeHtml(v("giangVien"))}</p>
+                <p>📞 <strong>Hotline:</strong>&nbsp;0856973736</p>
+                <p>📧 <strong>Email: </strong>vtmman@dthu.edu.vn - <strong><a href="[Gửi yêu cầu hỗ trợ]" target="_blank">Gửi yêu cầu hỗ trợ</a></strong></p>
+            </td></tr>
+        </tbody>
+    </table>
+    <table class="custom-table">
+        <tbody>
+            <tr><th class="custom-th" colspan="2">🗓️ Lịch học và thông báo</th></tr>
+            <tr>
+                <td class="custom-td" colspan="2">🎧 <strong>Phòng học:</strong>&nbsp;${escapeHtml(v("phongHoc"))}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>`;
+
+            document.getElementById("output").textContent = html;
+            showSuccess("Đã cập nhật HTML thành công!");
+        }
+
+        function copyHTML() {
+            const text = document.getElementById("output").textContent.trim();
+            if (!text) return alert("Chưa có HTML!");
+            navigator.clipboard.writeText(text).then(() => {
+                showSuccess("Đã copy HTML vào clipboard!");
+            }).catch(() => alert("Copy thủ công nhé."));
+        }
+
+        function clearForm() {
+            if (confirm("Xóa toàn bộ form?")) {
+                document.querySelectorAll("input, textarea").forEach(el => el.value = "");
+                document.getElementById("thoiGianHoc").value = "[Từ ngày... đến ngày...]";
+                document.getElementById("phongHoc").value = "https://meet.google.com/tzb-ixdv-tuh";
+                document.getElementById("yeuCau").value = "Tham gia đầy đủ hoàn thành các bài tập và bài kiểm tra và thi trực tiếp tại trường";
+                generateHTML();
+                showSuccess("Đã xóa form và khôi phục giá trị mặc định!");
+            }
+        }
+
+        // Khởi tạo ban đầu
+        window.onload = () => {
+            document.getElementById("thoiGianHoc").value = "[Từ ngày... đến ngày...]";
+            document.getElementById("phongHoc").value = "https://meet.google.com/tzb-ixdv-tuh";
+            generateHTML();
+        };
+    </script>
+</body>
+
+</html>
