@@ -373,8 +373,8 @@
 
         function textToBulletParagraphs(text) {
             const lines = String(text || "").split("\n").map(l => l.trim()).filter(Boolean);
-            // Sử dụng style text-indent âm để gạch đầu dòng sát lề và căn lề dòng thứ 2 thẳng hàng với văn bản
-            return lines.length ? lines.map(l => `<p style="margin-bottom: 5px; text-indent: -15px; padding-left: 15px;">- ${escapeHtml(l)}</p>`).join("\n") : "<p>- </p>";
+            // Sử dụng style text-indent âm để gạch đầu dòng sát lề, căn lề dòng thứ 2 và canh đều 2 bên
+            return lines.length ? lines.map(l => `<p style="margin-bottom: 5px; text-indent: -15px; padding-left: 15px; text-align: justify;">- ${escapeHtml(l)}</p>`).join("\n") : "<p>- </p>";
         }
 
         function generateHTML() {
@@ -396,7 +396,7 @@
         <tbody>
             <tr><th class="custom-th" colspan="2">Mô tả khóa học</th></tr>
             <tr>
-                <td class="custom-td" colspan="2">
+                <td class="custom-td" colspan="2" style="text-align: justify;">
                     <div class="description-section"><strong>Tổng quan về nội dung môn học:</strong></div>
                     <div class="description-section">${v("tongQuan").split("\n").map(p => `<p>${escapeHtml(p)}</p>`).join("")}</div>
                     <p><strong>Mục tiêu học tập:</strong>&nbsp;</p>
