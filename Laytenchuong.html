@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đọc Tên Chương PDF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 16px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 640px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
+            padding: 28px 32px;
+            color: white;
+        }
+
+        .card-header h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .card-header p {
+            font-size: 0.82rem;
+            opacity: 0.75;
+        }
+
+        .card-body {
+            padding: 28px 32px;
+        }
+
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background: #f8fafc;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.over {
+            border-color: #2d6a9f;
+            background: #eff6ff;
+        }
+
+        .drop-zone input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .drop-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .drop-zone h2 {
+            font-size: 1rem;
+            color: #1e3a5f;
+            margin-bottom: 6px;
+        }
+
+        .drop-zone p {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .progress-wrap {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #2d6a9f;
+            border-radius: 99px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        .progress-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 6px;
+        }
+
+        .results {
+            margin-top: 24px;
+            display: none;
+        }
+
+        .results-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .results-meta h3 {
+            font-size: 0.95rem;
+            color: #1e3a5f;
+            font-weight: 600;
+        }
+
+        .results-meta span {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .chapter-list {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .chapter-item {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            animation: slideIn 0.25s ease forwards;
+            opacity: 0;
+        }
+
+        .chapter-item:last-child {
+            border-bottom: none;
+        }
+
+        .chapter-item:hover {
+            background: #f8fafc;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ch-num {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: white;
+            background: #2d6a9f;
+            border-radius: 4px;
+            padding: 2px 7px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .ch-name {
+            flex: 1;
+            font-size: 0.88rem;
+            color: #1e293b;
+            line-height: 1.4;
+        }
+
+        .ch-page {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .empty {
+            padding: 32px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            line-height: 1.7;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-primary {
+            background: #1e3a5f;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #162d4a;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #1e3a5f;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-outline:hover {
+            border-color: #1e3a5f;
+            background: #f0f4f8;
+        }
+
+        .paste-area {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .paste-area textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            resize: vertical;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 24px 0;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .divider:not(:empty)::before {
+            margin-right: .75em;
+        }
+
+        .divider:not(:empty)::after {
+            margin-left: .75em;
+        }
+
+        /* Toast thông báo */
+        #successToast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #16a34a;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <div class="card-header">
+            <h1>📖 Đọc tên chương từ PDF</h1>
+            <p>Quét mục lục — chỉ lấy dòng "Chương X. ..."</p>
+        </div>
+
+        <div class="card-body">
+
+            <div class="drop-zone" id="dropZone">
+                <input type="file" id="fileInput" accept=".pdf">
+                <div class="drop-icon">📄</div>
+                <h2>Kéo thả hoặc bấm để chọn file PDF</h2>
+                <p>Hỗ trợ PDF có phần mục lục dạng văn bản</p>
+            </div>
+
+            <div class="divider">HOẶC DÁN VĂN BẢN VÀO ĐÂY</div>
+
+            <div class="paste-area" id="pasteArea">
+                <textarea id="pastedText"
+                    placeholder="Dán nội dung mục lục hoặc lời giới thiệu có chứa các chương vào đây..."></textarea>
+                <button class="btn btn-primary" onclick="processPastedText()">✨ Phân tích chương từ văn bản</button>
+            </div>
+
+            <div class="progress-wrap" id="progressWrap">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-label" id="progressLabel">Đang xử lý...</div>
+            </div>
+
+            <div class="results" id="results">
+                <div class="results-meta">
+                    <h3 id="resultsTitle"></h3>
+                    <span id="resultsMeta"></span>
+                </div>
+                <div class="chapter-list" id="chapterList"></div>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="copyAll()">📋 Sao chép</button>
+                    <button class="btn btn-outline" onclick="downloadTxt()">⬇ TXT</button>
+                    <button class="btn btn-outline" onclick="downloadJson()">⬇ JSON</button>
+                    <button class="btn btn-outline" onclick="resetAll()">🔄 Thử lại</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast thông báo thành công -->
+    <div id="successToast">
+        ✅ <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // Bắt linh hoạt: Chương + Số + Tên (trang ở cuối là tùy chọn)
+        // Hỗ trợ cả trường hợp không có trang và có dấu ; . ở cuối
+        const CHAPTER_RE = /Chương\s+(\d+)\s*[\.\s]\s*([^\n;.]+?)(?=\s+Chương\s+\d+|\s+\d+\s*$|[;.]\s|$)/gi;
+
+        let chapters = [];
+
+        function showSuccess(message) {
+            const toast = document.getElementById("successToast");
+            const toastMsg = document.getElementById("toastMessage");
+            toastMsg.textContent = message;
+            toast.style.display = "flex";
+            setTimeout(() => {
+                toast.style.display = "none";
+            }, 3000);
+        }
+
+        // Drag & Drop
+        const dz = document.getElementById('dropZone');
+        dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+        dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+        dz.addEventListener('drop', e => {
+            e.preventDefault(); dz.classList.remove('over');
+            const f = e.dataTransfer.files[0];
+            if (f?.type === 'application/pdf') processFile(f);
+        });
+        document.getElementById('fileInput').addEventListener('change', e => {
+            if (e.target.files[0]) processFile(e.target.files[0]);
+        });
+
+        function findChaptersInText(text, defaultPageNum) {
+            // Chuẩn hoá: gộp khoảng trắng thừa (do dấu ........ trong mục lục)
+            const cleanText = text.replace(/\.{2,}/g, ' ').replace(/\s+/g, ' ').trim();
+
+            let match;
+            // Dùng RegExp mới để quét toàn cục trên văn bản đã gộp
+            while ((match = CHAPTER_RE.exec(cleanText)) !== null) {
+                const chPrefix = `Chương ${match[1]}. `;
+                const chName = match[2].trim();
+                const name = chPrefix + chName;
+
+                // Mặc định lấy số trang hiện tại của PDF (nếu không có số trang ghi trong văn bản)
+                let pageNum = defaultPageNum;
+
+                // Thử tìm số trang nếu có (nếu văn bản ngay sau match là số)
+                const endIdx = match.index + match[0].length;
+                const lookAhead = cleanText.substring(endIdx, endIdx + 15);
+                const pgMatch = lookAhead.match(/^\s+(\d{1,3})(?=\s|$)/);
+                if (pgMatch) pageNum = parseInt(pgMatch[1]);
+
+                // Bỏ trùng lặp
+                if (!chapters.find(c => c.name === name)) {
+                    chapters.push({
+                        name,
+                        page: pageNum
+                    });
+                }
+            }
+        }
+
+        async function processPastedText() {
+            const text = document.getElementById('pastedText').value.trim();
+            if (!text) {
+                showSuccess("⚠️ Vui lòng dán văn bản trước!");
+                return;
+            }
+
+            chapters = [];
+            findChaptersInText(text, 1);
+
+            showResults("Văn bản đã dán", 1);
+            showSuccess("Đã trích xuất chương từ văn bản!");
+        }
+
+        async function processFile(file) {
+            setProgress(0, `Đang tải ${file.name}...`);
+            chapters = [];
+
+            const buf = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+            const total = pdf.numPages;
+
+            for (let i = 1; i <= total; i++) {
+                setProgress(Math.round(i / total * 100), `Đang quét trang ${i}/${total}...`);
+
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+
+                // Gộp text items của trang thành văn bản liên tục
+                const rawText = content.items.map(item => item.str).join(' ');
+
+                findChaptersInText(rawText, i);
+            }
+
+            // Sắp theo số trang
+            chapters.sort((a, b) => a.page - b.page);
+            showResults(file.name, total);
+            showSuccess(`Đã quét xong ${chapters.length} chương!`);
+        }
+
+        function showResults(filename, total) {
+            document.getElementById('progressWrap').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+
+            document.getElementById('resultsTitle').textContent =
+                `Tìm thấy ${chapters.length} chương`;
+            document.getElementById('resultsMeta').textContent =
+                `${filename} · ${total} trang`;
+
+            const list = document.getElementById('chapterList');
+            list.innerHTML = '';
+
+            if (!chapters.length) {
+                list.innerHTML = `<div class="empty">
+      Không tìm thấy chương nào.<br>
+      File có thể không có mục lục dạng văn bản.
+    </div>`;
+                return;
+            }
+
+            chapters.forEach((ch, i) => {
+                const div = document.createElement('div');
+                div.className = 'chapter-item';
+                div.style.animationDelay = `${i * 40}ms`;
+                div.innerHTML = `
+      <span class="ch-num">Ch.${i + 1}</span>
+      <span class="ch-name">${esc(ch.name)}</span>
+    `;
+                list.appendChild(div);
+            });
+        }
+
+        function setProgress(pct, label) {
+            document.getElementById('progressWrap').style.display = 'block';
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressLabel').textContent = label;
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function esc(s) {
+            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function copyAll() {
+            const text = chapters.map((c, i) =>
+                `${c.name}`
+            ).join('\n');
+            navigator.clipboard.writeText(text).then(() => showSuccess('Đã sao chép vào bộ nhớ tạm!'));
+        }
+
+        function downloadTxt() {
+            const text = chapters.map(c => `${c.name}`).join('\n');
+            dl('chuong.txt', text, 'text/plain');
+        }
+
+        function downloadJson() {
+            dl('chuong.json', JSON.stringify(chapters, null, 2), 'application/json');
+        }
+
+        function dl(name, content, type) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([content], { type }));
+            a.download = name; a.click();
+        }
+
+        function resetAll() {
+            chapters = [];
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('progressWrap').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('pastedText').value = '';
+            showSuccess("Đã làm mới dữ liệu!");
+        }
+    </script>
+</body>
+
+</html>

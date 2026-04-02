@@ -242,7 +242,8 @@
             </div>
             <div class="form-group">
                 <label>Yêu cầu đối với học viên</label>
-                <textarea id="yeuCau" rows="3" style="background:#f0fdf4; color:#166534;"></textarea>
+                <textarea id="yeuCau" rows="3" style="background:#f0fdf4; color:#166534; border-color:#bbf7d0;">Chủ động nghiên cứu tài liệu trên hệ thống
+Hoàn thành các bài kiểm tra đầy đủ</textarea>
             </div>
             <div class="form-group">
                 <label>Phương pháp giảng dạy và đánh giá <span class="hint">(mỗi nội dung một dòng)</span></label>
@@ -349,7 +350,7 @@
 
                     // Yêu cầu
                     let yeuCau = extractSection("Yêu cầu đối với học viên:", "Phương pháp giảng dạy và đánh giá:");
-                    document.getElementById("yeuCau").value = yeuCau || "Tham gia đầy đủ hoàn thành các bài tập và bài kiểm tra và thi trực tiếp tại trường";
+                    document.getElementById("yeuCau").value = yeuCau || "Chủ động nghiên cứu tài liệu trên hệ thống\nHoàn thành các bài kiểm tra đầy đủ";
 
                     // Phương pháp
                     document.getElementById("phuongPhap").value = extractSection("Phương pháp giảng dạy và đánh giá:", "Nội dung khóa học");
@@ -459,7 +460,7 @@
                 document.querySelectorAll("input, textarea").forEach(el => el.value = "");
                 document.getElementById("thoiGianHoc").value = "[Từ ngày... đến ngày...]";
                 document.getElementById("phongHoc").value = "https://meet.google.com/tzb-ixdv-tuh";
-                document.getElementById("yeuCau").value = "Tham gia đầy đủ hoàn thành các bài tập và bài kiểm tra và thi trực tiếp tại trường";
+                document.getElementById("yeuCau").value = "Chủ động nghiên cứu tài liệu trên hệ thống\nHoàn thành các bài kiểm tra đầy đủ";
                 generateHTML();
                 showSuccess("Đã xóa form và khôi phục giá trị mặc định!");
             }
@@ -469,6 +470,7 @@
         window.onload = () => {
             document.getElementById("thoiGianHoc").value = "[Từ ngày... đến ngày...]";
             document.getElementById("phongHoc").value = "https://meet.google.com/tzb-ixdv-tuh";
+            document.getElementById("yeuCau").value = "Chủ động nghiên cứu tài liệu trên hệ thống\nHoàn thành các bài kiểm tra đầy đủ";
             generateHTML();
         };
     </script>
