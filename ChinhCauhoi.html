@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công Cụ Chỉnh Câu Hỏi Ôn Tập | Chuyên sâu</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0c0e16;
+            --surface: #13161f;
+            --surface2: #1a1e2a;
+            --surface3: #222736;
+            --border: #2a3045;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warn: #f59e0b;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --text-muted: #4a5568;
+            --r: 10px;
+        }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #111827 0%, #0c0e16 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 0 20px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .hdr-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #2563eb, #0891b2);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .hdr-title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .hdr-sub {
+            font-size: 11px;
+            color: #4a5568;
+            margin-top: 1px;
+        }
+
+        .hdr-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hdr-stat {
+            font-size: 11px;
+            color: var(--text-dim);
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .workspace {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 380px 1fr 1fr;
+            overflow: hidden;
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-right: 1px solid var(--border);
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel-hdr {
+            padding: 10px 14px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .panel-hdr h2 {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+        }
+
+        .pill {
+            margin-left: auto;
+            font-size: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+            background: var(--surface2);
+            padding: 2px 7px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .led {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .led-blue {
+            background: var(--accent);
+        }
+
+        .led-green {
+            background: var(--success);
+        }
+
+        .led-yellow {
+            background: var(--warn);
+        }
+
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .panel-body::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .panel-body::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        #htmlInput {
+            width: 100%;
+            height: 100%;
+            background: var(--surface);
+            border: none;
+            outline: none;
+            color: #7dd3fc;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            line-height: 1.8;
+            padding: 13px;
+            resize: none;
+            tab-size: 2;
+        }
+
+        .panel-foot {
+            padding: 9px 12px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-accent:hover {
+            background: #2563eb;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-ghost {
+            background: var(--surface2);
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface3);
+            color: var(--text);
+        }
+
+        .spacer {
+            flex: 1;
+        }
+
+        /* Title row */
+        .title-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 9px 11px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+        }
+
+        .title-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .title-input {
+            flex: 1;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'Be Vietnam Pro', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 9px;
+            outline: none;
+        }
+
+        .title-input:focus {
+            border-color: var(--accent);
+        }
+
+        /* Question cards */
+        .q-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .q-card:focus-within {
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.05);
+        }
+
+        .q-card-top {
+            padding: 7px 10px;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .q-badge {
+            background: linear-gradient(135deg, #1d4ed8, #0e7490);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .q-move-btns {
+            display: flex;
+            gap: 3px;
+        }
+
+        .q-mb {
+            width: 20px;
+            height: 20px;
+            background: var(--surface3);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-dim);
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .q-mb:hover {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .q-del {
+            margin-left: auto;
+            width: 20px;
+            height: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .q-del:hover {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--danger);
+        }
+
+        .q-card-body {
+            padding: 10px;
+        }
+
+        .q-ta {
+            width: 100%;
+            min-height: 68px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'Be Vietnam Pro', sans-serif;
+            font-size: 13px;
+            line-height: 1.6;
+            padding: 8px 10px;
+            resize: vertical;
+            outline: none;
+        }
+
+        .q-ta:focus {
+            border-color: var(--accent);
+        }
+
+        #previewFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #f8fafc;
+        }
+
+        .empty {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--text-muted);
+        }
+
+        .empty .ico {
+            font-size: 34px;
+            opacity: 0.35;
+        }
+
+        .empty p {
+            font-size: 12px;
+            text-align: center;
+            max-width: 200px;
+            line-height: 1.6;
+        }
+
+        .statusbar {
+            height: 26px;
+            flex-shrink: 0;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            gap: 12px;
+            font-size: 10px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .s-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .overlay.on {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 82vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-hdr {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #exportOut {
+            flex: 1;
+            width: 100%;
+            background: #090b12;
+            border: none;
+            outline: none;
+            color: #67e8f9;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            line-height: 1.75;
+            padding: 13px;
+            resize: none;
+            min-height: 340px;
+        }
+
+        .modal-foot {
+            padding: 9px 13px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 18px;
+            right: 18px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-size: 12px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 14px 45px rgba(0, 0, 0, 0.5);
+            transform: translateY(60px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 999;
+        }
+
+        .toast.on {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="hdr-icon">📋</div>
+        <div>
+            <div class="hdr-title">Công Cụ Chỉnh Câu Hỏi Ôn Tập</div>
+            <div class="hdr-sub">Dán HTML có cấu trúc câu hỏi → Sửa nội dung → Xuất file</div>
+        </div>
+        <div class="hdr-right">
+            <span class="hdr-stat" id="hdrStat">0 câu hỏi</span>
+        </div>
+    </header>
+
+    <div class="workspace">
+        <!-- PANEL 1: Nhập HTML gốc (cấu trúc chuẩn) -->
+        <div class="panel" id="pInput">
+            <div class="panel-hdr">
+                <div class="led led-yellow"></div>
+                <h2>Dán HTML câu hỏi (định dạng div style)</h2>
+                <span class="pill" id="charPill">0 ký tự</span>
+            </div>
+            <div class="panel-body">
+                <textarea id="htmlInput" placeholder="Dán đoạn HTML có cấu trúc như sau:
+&lt;div style=&quot;max-width:900px; margin:auto;&quot;&gt;
+   &lt;h1&gt;CÂU HỎI ÔN TẬP CHƯƠNG 1&lt;/h1&gt;
+   &lt;div&gt;
+      &lt;div&gt;CÂU HỎI 1&lt;/div&gt;
+      &lt;h2&gt;Nội dung câu hỏi 1...&lt;/h2&gt;
+   &lt;/div&gt;
+   ... 
+&lt;/div&gt;
+
+Bạn có thể copy HTML mẫu bên dưới bằng nút &quot;📄 Mẫu&quot;"></textarea>
+            </div>
+            <div class="panel-foot">
+                <button class="btn btn-accent" onclick="phanTich()">⚡ Phân tích</button>
+                <button class="btn btn-ghost" onclick="danMau()">📄 Mẫu</button>
+                <button class="btn btn-ghost" onclick="xoaInput()" title="Xóa">🗑</button>
+            </div>
+        </div>
+
+        <!-- PANEL 2: Chỉnh sửa -->
+        <div class="panel">
+            <div class="panel-hdr">
+                <div class="led led-green"></div>
+                <h2>Chỉnh sửa câu hỏi</h2>
+                <span class="pill" id="qCountPill">0 câu</span>
+            </div>
+            <div class="panel-body" id="editorBody">
+                <div class="empty">
+                    <div class="ico">✏️</div>
+                    <p>Dán HTML câu hỏi và nhấn <strong>Phân tích</strong></p>
+                </div>
+            </div>
+            <div class="panel-foot">
+                <button class="btn btn-ghost" onclick="themCau()">➕ Thêm câu</button>
+                <div class="spacer"></div>
+                <button class="btn btn-success" onclick="xuatHTML()">📤 Xuất HTML</button>
+            </div>
+        </div>
+
+        <!-- PANEL 3: Live Preview -->
+        <div class="panel">
+            <div class="panel-hdr">
+                <div class="led led-blue"></div>
+                <h2>Live Preview (đúng layout)</h2>
+            </div>
+            <div class="panel-body" style="padding:0;overflow:hidden;">
+                <iframe id="previewFrame" src="about:blank"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <div class="statusbar">
+        <div style="display:flex;align-items:center;gap:5px;">
+            <div class="s-dot" style="background:var(--success)"></div>
+            <span id="statusMsg">Sẵn sàng</span>
+        </div>
+        <span style="margin-left:auto" id="clock"></span>
+    </div>
+
+    <!-- MODAL XUẤT -->
+    <div class="overlay" id="exportOverlay">
+        <div class="modal">
+            <div class="modal-hdr">
+                <span>📄</span>
+                <h3>HTML Đã Xuất (giữ nguyên kiểu dáng)</h3>
+                <div style="margin-left:auto;display:flex;gap:6px;">
+                    <button class="btn btn-ghost" onclick="copyHTML()">📋 Sao chép</button>
+                    <button class="btn btn-ghost" onclick="taiXuong()">⬇ Tải xuống</button>
+                    <button class="btn btn-ghost" onclick="xemTruoc()">👁 Xem trước</button>
+                    <button class="btn btn-ghost" onclick="dongModal()">✕</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <textarea id="exportOut" readonly></textarea>
+            </div>
+            <div class="modal-foot">
+                <button class="btn btn-success" onclick="copyHTML()">📋 Sao chép toàn bộ</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><span id="toastIco">✓</span><span id="toastMsg"></span></div>
+
+    <script>
+        /* ---------- STATE ---------- */
+        let questions = [];          // mỗi phần tử { stt, noiDung }
+        let titleText = 'CÂU HỎI TỰ HỌC CHƯƠNG 1';
+        let subTitleText = '( Sinh viên không cần nộp bài )';
+
+        // Clock
+        setInterval(() => {
+            document.getElementById('clock').textContent = new Date().toLocaleString('vi-VN');
+        }, 1000);
+
+        // Char count
+        document.getElementById('htmlInput').addEventListener('input', function () {
+            document.getElementById('charPill').textContent = this.value.length.toLocaleString() + ' ký tự';
+        });
+
+        function toast(msg, ok = true) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastIco').textContent = ok ? '✓' : '⚠';
+            document.getElementById('toastMsg').textContent = msg;
+            t.classList.add('on');
+            setTimeout(() => t.classList.remove('on'), 2800);
+        }
+
+        /* ----- PHÂN TÍCH: Đặc tả theo cấu trúc HTML giống mẫu (div style + h1 + các div chứa tag và h2) ----- */
+        function phanTich() {
+            const rawHtml = document.getElementById('htmlInput').value.trim();
+            if (!rawHtml) { toast('Vui lòng dán HTML vào trước', false); return; }
+
+            questions = [];
+            titleText = 'CÂU HỎI TỰ HỌC CHƯƠNG 1'; // default
+            subTitleText = '( Sinh viên không cần nộp bài )';
+
+            // Dùng DOMParser để bóc tách cấu trúc
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(rawHtml, 'text/html');
+
+            // 1. Lấy tiêu đề H1 đầu tiên
+            const h1Elem = doc.querySelector('h1');
+            if (h1Elem && h1Elem.textContent.trim().length > 0) {
+                let rawTitle = h1Elem.textContent.trim().replace(/\n/g, ' ').replace(/\s+/g, ' ');
+                // Tự động đổi "ÔN TẬP" thành "TỰ HỌC" nhưng giữ lại tên chương (Chương 1, Chương 2...)
+                titleText = rawTitle.replace(/CÂU HỎI ÔN TẬP/gi, 'CÂU HỎI TỰ HỌC').replace(/ÔN TẬP/gi, 'TỰ HỌC');
+            }
+            subTitleText = '( Sinh viên không cần nộp bài )'; // Luôn giữ dòng này làm mặc định
+            const titleInput = document.getElementById('globalTitleInput');
+            if (titleInput) titleInput.value = titleText;
+            const subInput = document.getElementById('subTitleInput');
+            if (subInput) subInput.value = subTitleText;
+
+            // 2. Tìm tất cả các khối câu hỏi: tìm div chứa trực tiếp h2 và có chứa phần tử hiển thị "CÂU HỎI X"
+            // Dựa vào cấu trúc mẫu: mỗi câu hỏi là 1 div style background:#fff border-radius... bên trong có div inline-block chứa "CÂU HỎI X" và h2 chứa nội dung.
+            // Cách tiếp cận: lấy tất cả div có style chứa "background:#fff" hoặc có border-left (có thể lấy các div con trực tiếp chứa h2)
+            let questionDivs = Array.from(doc.querySelectorAll('div')).filter(div => {
+                // Kiểm tra có chứa h2 bên trong và có chứa text "CÂU HỎI" (trong bất kỳ phần tử nào)
+                const hasH2 = div.querySelector('h2') !== null;
+                const hasQuestionText = div.innerText.includes('CÂU HỎI') || div.innerText.match(/CÂU HỎI\s*\d+/i);
+                // Tránh lấy container chính
+                const styleAttr = div.getAttribute('style') || '';
+                const isContainer = styleAttr.includes('max-width:900px') || styleAttr.includes('margin:auto');
+                return hasH2 && hasQuestionText && !isContainer && div.querySelector('h2').textContent.trim().length > 5;
+            });
+
+            // Nếu không tìm thấy theo div, fallback tìm theo các class phổ biến
+            if (questionDivs.length === 0) {
+                questionDivs = Array.from(doc.querySelectorAll('.cauhoi, .question-item, [class*="cauhoi"], div')).filter(el => {
+                    const hasH2 = el.querySelector('h2');
+                    const text = el.textContent.trim();
+                    return hasH2 && (text.includes('CÂU HỎI') || text.includes('Câu hỏi')) && text.length > 15;
+                });
+            }
+
+            // Duyệt và lấy nội dung
+            questionDivs.forEach((div, idx) => {
+                // Lấy nội dung từ thẻ h2 đầu tiên bên trong
+                const h2Tag = div.querySelector('h2');
+                if (!h2Tag) return;
+                let rawContent = h2Tag.textContent.trim();
+                // Làm sạch nếu có dư thừa
+                rawContent = rawContent.replace(/^CÂU HỎI\s*\d+\s*[:\-.]?\s*/i, '').replace(/^Câu hỏi\s*\d+\s*[:\-.]?\s*/i, '').trim();
+                if (rawContent.length === 0) return;
+                questions.push({ stt: idx + 1, noiDung: rawContent });
+            });
+
+            // Fallback cuối: nếu không có, thử parse các dòng từ raw string dạng "CÂU HỎI 1 ..." pattern
+            if (questions.length === 0) {
+                const regex = /CÂU HỎI\s*(\d+)\s*([^<]+?)(?=<div|<\/div|$)/gi;
+                let match;
+                while ((match = regex.exec(rawHtml)) !== null) {
+                    let content = match[2].replace(/<[^>]*>/g, '').trim();
+                    if (content.length > 3) {
+                        questions.push({ stt: questions.length + 1, noiDung: content });
+                    }
+                }
+            }
+
+            // Re-index STT
+            questions.forEach((q, i) => q.stt = i + 1);
+
+            if (questions.length === 0) {
+                toast('Không tìm thấy câu hỏi nào. Hãy chắc chắn HTML có thẻ h2 và nhãn "CÂU HỎI"', false);
+                document.getElementById('statusMsg').textContent = 'Phân tích thất bại, không có câu hỏi';
+                renderEditor();
+                renderPreview();
+                return;
+            }
+
+            document.getElementById('hdrStat').textContent = questions.length + ' câu hỏi';
+            document.getElementById('statusMsg').textContent = `✅ Phân tích thành công — ${questions.length} câu hỏi`;
+
+            // Xóa dữ liệu cũ trong input để tránh nhầm lẫn
+            document.getElementById('htmlInput').value = '';
+            document.getElementById('charPill').textContent = '0 ký tự';
+
+            renderEditor();
+            renderPreview();
+            toast(`Đã tìm thấy ${questions.length} câu hỏi, bạn có thể chỉnh sửa`);
+        }
+
+        /* ----- RENDER DANH SÁCH CÂU HỎI (chỉnh sửa) ----- */
+        function esc(str = '') {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function renderEditor() {
+            const body = document.getElementById('editorBody');
+            document.getElementById('qCountPill').textContent = questions.length + ' câu';
+            document.getElementById('hdrStat').textContent = questions.length + ' câu hỏi';
+
+            if (questions.length === 0) {
+                body.innerHTML = '<div class="empty"><div class="ico">📭</div><p>Không có câu hỏi. Hãy dán HTML và nhấn "Phân tích"</p></div>';
+                return;
+            }
+
+            // Tiêu đề chính (chỉ render 1 lần duy nhất trong title-row đã có sẵn hoặc tạo mới)
+            let editorHtml = `
+            <div class="title-row">
+                <div>
+                    <span class="title-label">TIÊU ĐỀ CHÍNH</span>
+                    <input class="title-input" value="${esc(titleText)}" id="globalTitleInput" 
+                        oninput="titleText=this.value; renderPreview();" placeholder="VD: CÂU HỎI TỰ HỌC CHƯƠNG 1">
+                </div>
+                <div style="margin-top:10px;">
+                    <span class="title-label" style="background:#64748b;">TIÊU ĐỀ PHỤ / GHI CHÚ</span>
+                    <input class="title-input" value="${esc(subTitleText)}" id="subTitleInput" 
+                        oninput="subTitleText=this.value; renderPreview();" placeholder="VD: (Sinh viên không cần nộp bài)">
+                </div>
+            </div>
+            <div id="questions-container">
+            `;
+
+            questions.forEach((q, idx) => {
+                editorHtml += `
+                <div class="q-card" data-idx="${idx}">
+                    <div class="q-card-top">
+                        <div class="q-badge">CÂU HỎI ${q.stt}</div>
+                        <div class="q-move-btns">
+                            <button class="q-mb" onclick="moveUp(${idx})">↑</button>
+                            <button class="q-mb" onclick="moveDown(${idx})">↓</button>
+                        </div>
+                        <button class="q-del" onclick="xoaCau(${idx})">✕</button>
+                    </div>
+                    <div class="q-card-body">
+                        <textarea class="q-ta" oninput="questions[${idx}].noiDung = this.value; renderPreview();" placeholder="Nhập nội dung câu hỏi...">${esc(q.noiDung)}</textarea>
+                    </div>
+                </div>
+                `;
+            });
+
+            editorHtml += `</div>`;
+            body.innerHTML = editorHtml;
+        }
+
+        /* ----- CÁC THAO TÁC ----- */
+        function moveUp(idx) {
+            if (idx === 0) return;
+            [questions[idx], questions[idx - 1]] = [questions[idx - 1], questions[idx]];
+            questions.forEach((q, i) => q.stt = i + 1);
+            renderEditor(); renderPreview();
+        }
+        function moveDown(idx) {
+            if (idx >= questions.length - 1) return;
+            [questions[idx], questions[idx + 1]] = [questions[idx + 1], questions[idx]];
+            questions.forEach((q, i) => q.stt = i + 1);
+            renderEditor(); renderPreview();
+        }
+        function xoaCau(idx) {
+            questions.splice(idx, 1);
+            questions.forEach((q, i) => q.stt = i + 1);
+            renderEditor(); renderPreview();
+            toast('Đã xóa câu hỏi');
+        }
+        function themCau() {
+            questions.push({ stt: questions.length + 1, noiDung: 'Nhập nội dung câu hỏi mới tại đây...' });
+            renderEditor(); renderPreview();
+            setTimeout(() => document.getElementById('editorBody').scrollTop = 99999, 80);
+            toast('Đã thêm câu hỏi mới');
+        }
+
+        /* ----- LIVE PREVIEW giữ nguyên giao diện y hệt mẫu (inline style như yêu cầu) ----- */
+        function renderPreview() {
+            if (!questions.length) {
+                document.getElementById('previewFrame').srcdoc = '<html><body style="background:#f1f5f9; display:flex;align-items:center;justify-content:center;"><p style="color:#888">Chưa có câu hỏi</p></body></html>';
+                return;
+            }
+
+            let questionsHtml = '';
+            for (let q of questions) {
+                questionsHtml += `
+            <div style="background:#fff; border-radius:12px; padding:20px 25px; margin-bottom:20px; box-shadow:0 5px 15px rgba(0,0,0,0.08); border-left:6px solid #2563eb;">
+                <div style="display:inline-block; background:#2563eb; color:#fff; padding:6px 12px; border-radius:20px; font-size:13px; font-weight:bold; margin-bottom:10px;">
+                    CÂU HỎI ${q.stt}
+                </div>
+                <h2 style="font-size:18px; font-weight:600; color:#111827; line-height:1.5; margin:10px 0;">
+                    ${he(q.noiDung)}
+                </h2>
+            </div>
+            `;
+            }
+
+            const fullHtml = `<!DOCTYPE html>
+<html lang="vi">
+<head><meta charset="UTF-8">
+<style>
+    body { font-family: Arial, sans-serif; background: #f8fafc; margin:0; padding: 40px 20px; }
+    * { box-sizing: border-box; }
+</style>
+</head>
+<body>
+<div style="max-width:900px; margin:auto; font-family:Arial, sans-serif;">
+    <h1 style="text-align:center; font-size:28px; font-weight:bold; color:#1e3a8a; margin-bottom:5px;">
+        ${he(titleText)}
+    </h1>
+    <div style="text-align:center; color:#64748b; font-size:16px; margin-bottom:30px; font-style:italic;">
+        ${he(subTitleText)}
+    </div>
+    ${questionsHtml}
+</div>
+</body>
+</html>`;
+            document.getElementById('previewFrame').srcdoc = fullHtml;
+        }
+
+        function he(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+        /* ----- XUẤT HTML: đúng layout gốc, chỉ thay đổi nội dung câu hỏi và tiêu đề ----- */
+        function xuatHTML() {
+            if (questions.length === 0) { toast('Chưa có câu hỏi để xuất', false); return; }
+
+            let exportQuestionsHtml = '';
+            for (let q of questions) {
+                exportQuestionsHtml += `
+    <div style="background:#fff; border-radius:12px; padding:20px 25px; margin-bottom:20px; box-shadow:0 5px 15px rgba(0,0,0,0.08); border-left:6px solid #2563eb;">
+        <div style="display:inline-block; background:#2563eb; color:#fff; padding:6px 12px; border-radius:20px; font-size:13px; font-weight:bold; margin-bottom:10px;">
+            CÂU HỎI ${q.stt}
+        </div>
+        <h2 style="font-size:18px; font-weight:600; color:#111827; line-height:1.5; margin:10px 0;">
+            ${he(q.noiDung)}
+        </h2>
+    </div>
+            `;
+            }
+
+            const finalHtml = `<div style="max-width:900px; margin:auto; font-family:Arial, sans-serif; background:#f8fafc; padding: 40px 20px; border-radius: 12px;">
+    <h1 style="text-align:center; font-size:28px; font-weight:bold; color:#1e3a8a; margin-bottom:5px; margin-top:0;">
+        ${he(titleText)}
+    </h1>
+    <div style="text-align:center; color:#64748b; font-size:16px; margin-bottom:30px; font-style:italic;">
+        ${he(subTitleText)}
+    </div>
+${exportQuestionsHtml}
+</div>`;
+
+            document.getElementById('exportOut').value = finalHtml;
+            document.getElementById('exportOverlay').classList.add('on');
+        }
+
+        function dongModal() { document.getElementById('exportOverlay').classList.remove('on'); }
+        function copyHTML() {
+            const txt = document.getElementById('exportOut').value;
+            navigator.clipboard.writeText(txt).then(() => toast('Đã sao chép HTML')).catch(() => { document.getElementById('exportOut').select(); document.execCommand('copy'); toast('Đã sao chép'); });
+        }
+        function taiXuong() {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([document.getElementById('exportOut').value], { type: 'text/html' }));
+            a.download = 'CauHoi_OnTap_chinhsua.html';
+            a.click();
+            toast('Đang tải xuống...');
+        }
+        function xemTruoc() {
+            const w = window.open('', '_blank');
+            w.document.write(document.getElementById('exportOut').value);
+            w.document.close();
+        }
+
+        /* ----- MẪU DÁN ĐÚNG CẤU TRÚC YÊU CẦU ----- */
+        function danMau() {
+            const sampleHtml = `<div style="max-width:900px; margin:auto; font-family:Arial, sans-serif;">
+
+    <h1 style="text-align:center; font-size:28px; font-weight:bold; color:#1e3a8a; margin-bottom:30px;">
+        CÂU HỎI TỰ HỌC CHƯƠNG 1
+    </h1>
+
+    <div style="background:#fff; border-radius:12px; padding:20px 25px; margin-bottom:20px; box-shadow:0 5px 15px rgba(0,0,0,0.08); border-left:6px solid #2563eb;">
+        <div style="display:inline-block; background:#2563eb; color:#fff; padding:6px 12px; border-radius:20px; font-size:13px; font-weight:bold; margin-bottom:10px;">
+            CÂU HỎI 1
+        </div>
+        <h2 style="font-size:18px; font-weight:600; color:#111827; line-height:1.5; margin:10px 0;">
+            Phân tích đối tượng nghiên cứu của Lý luận về Nhà nước và Pháp luật.
+        </h2>
+    </div>
+
+    <div style="background:#fff; border-radius:12px; padding:20px 25px; margin-bottom:20px; box-shadow:0 5px 15px rgba(0,0,0,0.08); border-left:6px solid #2563eb;">
+        <div style="display:inline-block; background:#2563eb; color:#fff; padding:6px 12px; border-radius:20px; font-size:13px; font-weight:bold; margin-bottom:10px;">
+            CÂU HỎI 2
+        </div>
+        <h2 style="font-size:18px; font-weight:600; color:#111827; line-height:1.5; margin:10px 0;">
+            Phân tích mối quan hệ giữa khoa học Lý luận chung về Nhà nước và Pháp luật với môn học.
+        </h2>
+    </div>
+
+    <div style="background:#fff; border-radius:12px; padding:20px 25px; margin-bottom:20px; box-shadow:0 5px 15px rgba(0,0,0,0.08); border-left:6px solid #2563eb;">
+        <div style="display:inline-block; background:#2563eb; color:#fff; padding:6px 12px; border-radius:20px; font-size:13px; font-weight:bold; margin-bottom:10px;">
+            CÂU HỎI 3
+        </div>
+        <h2 style="font-size:18px; font-weight:600; color:#111827; line-height:1.5; margin:10px 0;">
+            Trình bày khái niệm và đặc điểm của Nhà nước theo quan điểm chủ nghĩa Mác - Lênin.
+        </h2>
+    </div>
+
+</div>`;
+            document.getElementById('htmlInput').value = sampleHtml;
+            document.getElementById('charPill').textContent = sampleHtml.length.toLocaleString() + ' ký tự';
+            toast('Đã dán mẫu HTML (cấu trúc đúng)');
+        }
+
+        function xoaInput() {
+            document.getElementById('htmlInput').value = '';
+            document.getElementById('charPill').textContent = '0 ký tự';
+            toast('Đã xóa vùng nhập');
+        }
+
+        document.getElementById('exportOverlay').addEventListener('click', function (e) {
+            if (e.target === this) dongModal();
+        });
+    </script>
+</body>
+
+</html>
