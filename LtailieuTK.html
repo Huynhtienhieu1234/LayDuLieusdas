@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lấy tài liệu tham khảo</title>
+    <title>Trình Trích Xuất & Biên Tập Tài Liệu</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,105 +14,133 @@
             --primary: #4361ee;
             --secondary: #4cc9f0;
             --success: #06d6a0;
-            --bg: #f0f2f5;
-            --text: #2b2d42;
+            --bg: #f8fafc;
+            --text: #1e293b;
         }
 
         body { font-family: 'Inter', sans-serif; background: var(--bg); padding: 40px 20px; color: var(--text); }
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; }
         
         header { text-align: center; margin-bottom: 40px; }
-        h1 { color: var(--primary); font-weight: 800; }
+        h1 { color: var(--primary); font-weight: 800; letter-spacing: -1px; }
 
+        /* GRID NHẬP LIỆU */
+        .input-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 25px; 
+            margin-bottom: 30px;
+        }
+
+        /* VÙNG UPLOAD PDF */
         .upload-zone {
             border: 2px dashed #cbd5e1; border-radius: 20px; background: #fff;
-            padding: 50px 30px; text-align: center; cursor: pointer; transition: 0.3s;
+            padding: 40px 20px; text-align: center; cursor: pointer; transition: 0.3s;
             position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .upload-zone:hover { border-color: var(--primary); background: #f8faff; }
+        .upload-zone:hover { border-color: var(--primary); background: #f0f7ff; }
         .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 
-        .progress-wrap { display: none; margin-top: 30px; background: #fff; border-radius: 16px; padding: 25px; }
-        .progress-bar-bg { background: #f1f5f9; border-radius: 50px; height: 8px; overflow: hidden; margin-top: 15px; }
-        .progress-bar { height: 100%; background: var(--primary); width: 0%; transition: 0.4s; }
+        /* VÙNG DÁN TEXT */
+        .paste-zone {
+            background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .paste-zone textarea {
+            width: 100%; min-height: 150px; border: 1px solid #cbd5e1; border-radius: 12px;
+            padding: 12px; resize: vertical; outline: none; font-size: 0.9rem; transition: 0.2s;
+        }
+        .paste-zone textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1); }
 
-        .result-card { display: none; margin-top: 40px; background: #fff; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; }
-        .result-header { padding: 20px 30px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fff; }
+        /* VÙNG BIÊN TẬP */
+        .result-card { display: none; background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; margin-top: 20px; }
+        .result-header { padding: 18px 25px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
         
-        /* Ô CHỈNH SỬA NỘI DUNG */
         .result-body { 
-            padding: 30px; 
-            max-height: 600px; 
-            overflow-y: auto; 
-            font-family: 'Times New Roman', serif; 
-            font-size: 1.1rem;
-            outline: none;
-            min-height: 200px;
-            background: #fff;
+            padding: 30px; max-height: 500px; overflow-y: auto; 
+            font-family: 'Times New Roman', serif; font-size: 1.15rem; outline: none;
         }
-        .result-body:focus { background: #fffcf0; transition: 0.3s; }
+        .result-body:focus { background: #fffdf5; }
 
-        /* Style hiển thị tạm thời trong ô sửa */
-        .editable-section { font-weight: bold; color: var(--primary); display: block; margin-top: 20px; font-size: 1.2rem; }
-        .editable-item { display: block; margin-bottom: 10px; padding-left: 10px; }
+        /* CÁC THÀNH PHẦN TRONG Ô EDIT */
+        .editable-section { font-weight: bold; color: var(--primary); display: block; margin-top: 25px; font-family: 'Inter', sans-serif; text-transform: uppercase; }
+        .editable-item { display: block; margin-bottom: 8px; padding-left: 15px; border-left: 2px solid #e2e8f0; }
 
-        .button-group { padding: 20px 30px; background: #f8fafc; border-top: 1px solid #eee; display: flex; gap: 12px; flex-wrap: wrap; }
-        .btn-custom { padding: 10px 22px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .btn-custom:hover { opacity: 0.9; transform: translateY(-2px); }
+        /* BUTTONS */
+        .button-group { padding: 20px 25px; background: #f8fafc; border-top: 1px solid #f1f5f9; display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-custom { padding: 10px 20px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; transition: 0.2s; font-size: 0.9rem; }
+        .btn-custom:hover { transform: translateY(-2px); filter: brightness(1.1); }
 
-        .html-output-wrap { display: none; padding: 25px; background: #1e293b; }
-        .html-code-box { background: #0f172a; color: #38bdf8; padding: 20px; border-radius: 12px; font-family: monospace; font-size: 0.85rem; white-space: pre-wrap; max-height: 350px; overflow-y: auto; }
+        /* MÃ HTML OUTPUT */
+        .html-output-wrap { display: none; padding: 25px; background: #0f172a; }
+        .html-code-box { color: #38bdf8; font-family: 'Monaco', 'Consolas', monospace; font-size: 0.8rem; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
 
-        /* TOAST NOTIFICATION */
-        .toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 3000; }
-        .toast-custom { 
-            background: #fff; padding: 15px 25px; border-radius: 12px; margin-top: 10px;
-            box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-left: 5px solid var(--success);
-            display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        /* TOAST & PROGRESS */
+        .progress-wrap { display: none; margin-bottom: 30px; }
+        .toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 9999; }
+        .toast-custom { background: #fff; padding: 12px 20px; border-radius: 10px; margin-top: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-left: 4px solid var(--success); display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease; }
+        
+        @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        #previewModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; }
-        .modal-inner { background: #fff; width: 95%; max-width: 850px; border-radius: 20px; overflow: hidden; }
+        #previewModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-inner { background: #fff; width: 100%; max-width: 900px; border-radius: 20px; overflow: hidden; animation: zoomIn 0.2s ease; }
+        @keyframes zoomIn { from { transform: scale(0.95); } to { transform: scale(1); } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1><i class="bi bi-pencil-square me-2"></i>Trích Xuất & Biên Tập</h1>
-        <p class="text-muted">Ông có thể sửa trực tiếp nội dung bên dưới trước khi xuất mã</p>
+        <h1><i class="bi bi-layout-text-sidebar-reverse me-2"></i>Trích Xuất Tài Liệu</h1>
+        <p class="text-muted">Chọn PDF hoặc dán văn bản để tự động tạo danh mục chuẩn HTML</p>
     </header>
 
-    <div class="upload-zone">
-        <input type="file" id="fileInput" accept=".pdf">
-        <span style="font-size: 3rem;">📄</span>
-        <p class="mt-2 fw-bold">Thả PDF vào đây để bắt đầu</p>
+    <div class="input-grid">
+        <div class="upload-zone" id="dropZone">
+            <input type="file" id="fileInput" accept=".pdf">
+            <i class="bi bi-cloud-arrow-up" style="font-size: 2.5rem; color: var(--primary);"></i>
+            <p class="mt-2 fw-bold mb-1">Tải lên file PDF</p>
+            <p class="small text-muted">Kéo thả hoặc click để chọn file</p>
+        </div>
+
+        <div class="paste-zone">
+            <h6 class="fw-bold mb-2 small text-uppercase text-muted">Nhập liệu nhanh</h6>
+            <textarea id="pasteInput" placeholder="Dán danh sách tài liệu tham khảo thô tại đây..."></textarea>
+            <div class="d-flex justify-content-end mt-2">
+                <button class="btn btn-sm btn-outline-danger border-0" id="clearPasteBtn"><i class="bi bi-trash3 me-1"></i>Xóa sạch</button>
+            </div>
+        </div>
     </div>
 
     <div class="progress-wrap" id="progressWrap">
-        <div id="progressLabel" class="small fw-bold">Đang quét dữ liệu...</div>
-        <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="d-flex justify-content-between mb-1">
+            <span class="small fw-bold" id="progressLabel">Đang xử lý tài liệu...</span>
+            <span class="small text-muted" id="percentText">0%</span>
+        </div>
+        <div class="progress" style="height: 8px; border-radius: 10px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" role="progressbar" style="width: 0%"></div>
+        </div>
     </div>
 
     <div class="result-card" id="resultCard">
         <div class="result-header">
-            <h6 class="mb-0 fw-bold"><i class="bi bi-cursor-text me-2"></i>NỘI DUNG (CÓ THỂ SỬA ĐƯỢC)</h6>
-            <span class="badge bg-primary rounded-pill" id="countBadge">0 tài liệu</span>
+            <h6 class="mb-0 fw-bold text-primary"><i class="bi bi-pencil-square me-2"></i>VÙNG BIÊN TẬP NỘI DUNG</h6>
+            <span class="badge bg-light text-primary border" id="countBadge">0 mục</span>
         </div>
         
-        <div class="result-body" id="resultBody" contenteditable="true" spellcheck="false"></div>
+        <div class="result-body" id="resultBody" contenteditable="true" spellcheck="false" title="Nhấp vào để sửa trực tiếp"></div>
 
         <div class="button-group">
-            <button class="btn-custom" style="background: var(--success);" id="copyTextBtn"><i class="bi bi-clipboard"></i> Chép Văn Bản</button>
-            <button class="btn-custom" style="background: var(--secondary);" id="convertHtmlBtn"><i class="bi bi-code-slash"></i> Xuất Mã Hệ Thống</button>
-            <button class="btn-custom" style="background: var(--primary);" id="previewBtn"><i class="bi bi-eye"></i> Xem Preview</button>
+            <button class="btn-custom" style="background: var(--primary);" id="convertHtmlBtn"><i class="bi bi-braces"></i> Xuất Mã HTML</button>
+            <button class="btn-custom" style="background: var(--secondary);" id="previewBtn"><i class="bi bi-eye"></i> Xem Preview</button>
+            <button class="btn-custom" style="background: var(--success);" id="copyTextBtn"><i class="bi bi-file-earmark-text"></i> Chép Text</button>
         </div>
 
         <div class="html-output-wrap" id="htmlOutputWrap">
-            <div class="d-flex justify-content-between mb-2">
-                <span class="text-white small">MÃ HTML ĐÃ TỐI ƯU:</span>
-                <button class="btn btn-sm btn-light" id="copyCodeBtn">Copy Code</button>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-white-50 small">MÃ NGUỒN ĐÃ TỐI ƯU:</span>
+                <button class="btn btn-sm btn-light" id="copyCodeBtn"><i class="bi bi-copy me-1"></i>Copy Code</button>
             </div>
             <div class="html-code-box" id="htmlCodeBox"></div>
         </div>
@@ -123,11 +151,11 @@
 
 <div id="previewModal">
     <div class="modal-inner">
-        <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-            <h6 class="mb-0 fw-bold">Giao diện thực tế trên Model</h6>
+        <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+            <h6 class="mb-0 fw-bold">Giao Diện Hiển Thị Thực Tế</h6>
             <button class="btn-close" onclick="document.getElementById('previewModal').style.display='none'"></button>
         </div>
-        <div id="previewContent" style="padding:20px; max-height: 70vh; overflow-y: auto; background: #f0f2f5;"></div>
+        <div id="previewContent" style="padding:0; max-height: 80vh; overflow-y: auto; background: #f1f5f9;"></div>
     </div>
 </div>
 
@@ -135,25 +163,30 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
     let finalHtmlForModel = "";
+    const fileInput = document.getElementById('fileInput');
+    const pasteInput = document.getElementById('pasteInput');
+    const resultBody = document.getElementById('resultBody');
+    const resultCard = document.getElementById('resultCard');
+    const progressWrap = document.getElementById('progressWrap');
+    const progressBar = document.getElementById('progressBar');
 
-    function showToast(message) {
+    function showToast(message, icon = 'check-circle-fill') {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = 'toast-custom';
-        toast.innerHTML = `<i class="bi bi-check-circle-fill text-success"></i> <span>${message}</span>`;
+        toast.innerHTML = `<i class="bi bi-${icon}"></i> <span>${message}</span>`;
         container.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 2500);
     }
 
-    const fileInput = document.getElementById('fileInput');
-
+    // XỬ LÝ FILE PDF
     fileInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        document.getElementById('progressWrap').style.display = 'block';
-        document.getElementById('resultCard').style.display = 'none';
-
+        progressWrap.style.display = 'block';
+        resultCard.style.display = 'none';
+        
         try {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -162,33 +195,64 @@
             for (let i = 1; i <= pdf.numPages; i++) {
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
-                const lineMap = {};
-
-                textContent.items.forEach(item => {
+                const items = textContent.items;
+                
+                // Gộp text theo dòng y
+                let linesInPage = {};
+                items.forEach(item => {
                     const y = Math.round(item.transform[5]);
-                    let foundY = Object.keys(lineMap).find(key => Math.abs(parseFloat(key) - y) <= 5);
-                    if (foundY) lineMap[foundY].push(item);
-                    else lineMap[y] = [item];
+                    if (!linesInPage[y]) linesInPage[y] = [];
+                    linesInPage[y].push(item);
                 });
 
-                Object.keys(lineMap).sort((a,b)=> b-a).forEach(y => {
-                    const line = lineMap[y].sort((a,b)=> a.transform[4]-b.transform[4]).map(item => item.str).join(' ').trim();
-                    if (line) rawLines.push(line);
+                Object.keys(linesInPage).sort((a,b) => b - a).forEach(y => {
+                    const lineText = linesInPage[y]
+                        .sort((a,b) => a.transform[4] - b.transform[4])
+                        .map(item => item.str)
+                        .join(' ').trim();
+                    if (lineText) rawLines.push(lineText);
                 });
-                document.getElementById('progressBar').style.width = (i/pdf.numPages*100) + '%';
+
+                let percent = Math.round((i / pdf.numPages) * 100);
+                progressBar.style.width = percent + '%';
+                document.getElementById('percentText').innerText = percent + '%';
             }
-            processLinesToEditable(rawLines);
-        } catch (err) { alert("Lỗi: " + err.message); }
-        finally { document.getElementById('progressWrap').style.display = 'none'; }
+            
+            processData(rawLines);
+            showToast("Đã trích xuất xong từ PDF!");
+        } catch (err) {
+            alert("Lỗi đọc PDF: " + err.message);
+        } finally {
+            setTimeout(() => progressWrap.style.display = 'none', 500);
+        }
     });
 
-    function processLinesToEditable(lines) {
-        let startIdx = -1;
-        for (let i = 0; i < lines.length; i++) {
-            const clean = lines[i].toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            if (clean.includes("DANH MUC TAI LIEU THAM KHAO") || clean.includes("TÀI LIỆU THAM KHẢO")) {
-                startIdx = i + 1;
-                break;
+    // XỬ LÝ DÁN TEXT
+    pasteInput.addEventListener('input', () => {
+        const text = pasteInput.value.trim();
+        if (!text) return;
+        
+        const lines = text.split(/\n/).map(l => l.trim()).filter(l => l);
+        processData(lines, true);
+    });
+
+    document.getElementById('clearPasteBtn').onclick = () => {
+        pasteInput.value = "";
+        resultCard.style.display = 'none';
+        showToast("Đã xóa vùng nhập liệu", "trash");
+    };
+
+    // HÀM XỬ LÝ DỮ LIỆU CHUNG
+    function processData(lines, isManual = false) {
+        let startIdx = 0;
+        // Nếu là PDF, thử tìm tiêu đề "Tài liệu tham khảo"
+        if (!isManual) {
+            for (let i = 0; i < lines.length; i++) {
+                const clean = lines[i].toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                if (clean.includes("DANH MUC TAI LIEU") || clean.includes("TAI LIEU THAM KHAO")) {
+                    startIdx = i + 1;
+                    break;
+                }
             }
         }
 
@@ -196,71 +260,89 @@
         for (let i = startIdx; i < lines.length; i++) {
             let line = lines[i].trim();
             if (!line) continue;
+            
             const clean = line.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            if (clean.startsWith("PHU LUC") || clean.startsWith("APPENDIX")) break;
+            const isHeader = /^[IVX]+\./.test(line) || clean.includes("VAN BAN QUY PHAM") || clean.includes("SACH, BAO");
+            const isNumbered = /^\d+\./.test(line);
 
-            const isNewEntry = /^\d+\./.test(line) || /^[IVX]+\./.test(line) || clean.includes("VAN BAN QUY PHAM") || clean.includes("SACH, BAO");
-            if (isNewEntry || merged.length === 0) merged.push(line);
-            else merged[merged.length - 1] += " " + line;
+            if (isHeader || isNumbered || merged.length === 0) {
+                merged.push(line);
+            } else {
+                merged[merged.length - 1] += " " + line;
+            }
         }
 
-        let editContent = "";
-        merged.forEach(line => {
-            const clean = line.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            if (/^[IVX]+\./.test(line) || clean.includes("VAN BAN QUY PHAM") || clean.includes("SACH, BAO")) {
-                editContent += `<div class="editable-section">${line}</div>`;
+        renderEditable(merged);
+    }
+
+    function renderEditable(data) {
+        let html = "";
+        data.forEach(item => {
+            const clean = item.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (/^[IVX]+\./.test(item) || clean.includes("VAN BAN QUY PHAM") || clean.includes("SACH, BAO")) {
+                html += `<div class="editable-section">${item}</div>`;
             } else {
-                editContent += `<div class="editable-item">${line}</div>`;
+                html += `<div class="editable-item">${item}</div>`;
             }
         });
 
-        const rb = document.getElementById('resultBody');
-        rb.innerHTML = editContent;
-        document.getElementById('resultCard').style.display = 'block';
-        document.getElementById('countBadge').textContent = merged.length + " dòng";
+        resultBody.innerHTML = html;
+        resultCard.style.display = 'block';
+        document.getElementById('countBadge').innerText = data.length + " mục";
+        document.getElementById('htmlOutputWrap').style.display = 'none';
     }
 
-    // LOGIC XUẤT MÃ DỰA TRÊN NỘI DUNG ĐÃ SỬA
+    // XUẤT HTML
     document.getElementById('convertHtmlBtn').onclick = () => {
-        const editDiv = document.getElementById('resultBody');
-        const lines = Array.from(editDiv.children);
-        let htmlParts = "";
+        const elements = Array.from(resultBody.children);
+        let itemsHtml = "";
 
-        lines.forEach(el => {
+        elements.forEach(el => {
             const text = el.innerText.trim();
             if (!text) return;
             const clean = text.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-            if (/^[IVX]+\./.test(text)) {
-                htmlParts += `      <h4 style="color: #4361ee; font-weight: bold; margin-top: 35px; border-bottom: 2px solid #4361ee; padding-bottom: 8px; font-family: sans-serif;">${text}</h4>\n`;
-            } else if (clean.includes("VAN BAN QUY PHAM") || clean.includes("SACH, BAO")) {
-                htmlParts += `      <h5 style="color: #64748b; font-weight: bold; margin-top: 25px; text-transform: uppercase; font-family: sans-serif; font-size: 14px;">${text}</h5>\n`;
-            } else if (/^\d+\./.test(text)) {
-                let match = text.match(/^(\d+\.)(.*)/);
-                let num = match ? match[1] : "-";
-                let content = match ? match[2].trim() : text;
-                htmlParts += `      <div style="display: flex; margin-bottom: 15px; background: #ffffff; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; border-left: 5px solid #4cc9f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-        <div style="min-width: 35px; font-weight: bold; color: #4361ee; font-family: sans-serif;">${num}</div>
-        <div style="text-align: justify; color: #334155; font-family: 'Times New Roman', serif; font-size: 16px; line-height: 1.5;">${content}</div>
-      </div>\n`;
+            if (el.classList.contains('editable-section')) {
+                if (/^[IVX]+\./.test(text)) {
+                    itemsHtml += `<h4 style="color: #4361ee; font-weight: bold; margin-top: 35px; border-bottom: 2px solid #4361ee; padding-bottom: 8px; font-family: sans-serif; font-size: 18px;">${text}</h4>\n`;
+                } else {
+                    itemsHtml += `<h5 style="color: #64748b; font-weight: bold; margin-top: 25px; text-transform: uppercase; font-family: sans-serif; font-size: 14px; letter-spacing: 1px;">${text}</h5>\n`;
+                }
             } else {
-                // Trường hợp dòng tự do không có số
-                htmlParts += `      <div style="margin-bottom: 10px; color: #334155; font-family: 'Times New Roman', serif; font-size: 16px; padding-left: 35px;">${text}</div>\n`;
+                let match = text.match(/^(\d+\.)(.*)/);
+                let num = match ? match[1] : "•";
+                let content = match ? match[2].trim() : text;
+                
+                itemsHtml += `<div style="display: flex; margin-bottom: 12px; background: #ffffff; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                    <div style="min-width: 35px; font-weight: bold; color: #4361ee; font-family: sans-serif;">${num}</div>
+                    <div style="text-align: justify; color: #334155; font-family: 'Times New Roman', serif; font-size: 16px; line-height: 1.6;">${content}</div>
+                </div>\n`;
             }
         });
 
-        finalHtmlForModel = `<div style="background-color: #f8fafc; padding: 20px; font-family: sans-serif;">
-  <div style="max-width: 850px; margin: auto; background: #ffffff; padding: 30px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-    <div style="background: linear-gradient(135deg, #4361ee 0%, #4cc9f0 100%); padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 30px;">
-      <h2 style="color: #ffffff; margin: 0; font-weight: bold; text-transform: uppercase; font-size: 20px;">Danh Mục Tài Liệu Tham Khảo</h2>
-    </div>
-${htmlParts}
-  </div>
-</div>`;
+        finalHtmlForModel = `<div style="background-color: #f8fafc; padding: 30px 15px; font-family: sans-serif;">
+            <div style="max-width: 800px; margin: auto; background: #ffffff; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid #eef2f7;">
+                <div style="background: linear-gradient(135deg, #4361ee 0%, #4cc9f0 100%); padding: 30px; border-radius: 18px; text-align: center; margin-bottom: 40px;">
+                    <h2 style="color: #ffffff; margin: 0; font-weight: 800; text-transform: uppercase; font-size: 22px; letter-spacing: 1px;">Danh Mục Tài Liệu Tham Khảo</h2>
+                </div>
+                ${itemsHtml}
+            </div>
+        </div>`;
 
         document.getElementById('htmlCodeBox').textContent = finalHtmlForModel;
         document.getElementById('htmlOutputWrap').style.display = 'block';
-        showToast("Đã tạo mã HTML từ nội dung chỉnh sửa!");
+        showToast("Đã tạo mã HTML thành công!");
+    };
+
+    // COPY & PREVIEW
+    document.getElementById('copyCodeBtn').onclick = () => {
+        navigator.clipboard.writeText(finalHtmlForModel);
+        showToast("Đã chép mã HTML!");
+    };
+
+    document.getElementById('copyTextBtn').onclick = () => {
+        navigator.clipboard.writeText(resultBody.innerText);
+        showToast("Đã chép văn bản thuần!");
     };
 
     document.getElementById('previewBtn').onclick = () => {
@@ -269,14 +351,11 @@ ${htmlParts}
         document.getElementById('previewModal').style.display = 'flex';
     };
 
-    document.getElementById('copyTextBtn').onclick = () => {
-        navigator.clipboard.writeText(document.getElementById('resultBody').innerText);
-        showToast("Đã chép văn bản thuần!");
-    };
-
-    document.getElementById('copyCodeBtn').onclick = () => {
-        navigator.clipboard.writeText(finalHtmlForModel);
-        showToast("Đã chép mã HTML hệ thống!");
+    // Đóng modal khi bấm ngoài
+    window.onclick = (e) => {
+        if (e.target == document.getElementById('previewModal')) {
+            document.getElementById('previewModal').style.display = 'none';
+        }
     };
 </script>
 </body>
