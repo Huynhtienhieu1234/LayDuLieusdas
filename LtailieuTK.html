@@ -1,0 +1,199 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trích Xuất Tài Liệu Tham Khảo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; padding: 40px 20px; color: #333; }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 { text-align: center; color: #8b0000; margin-bottom: 30px; text-transform: uppercase; font-size: 1.6rem; }
+
+  /* Upload Area */
+  .upload-zone {
+    border: 3px dashed #c0392b; border-radius: 15px; background: #fff;
+    padding: 50px; text-align: center; cursor: pointer; transition: 0.3s;
+    position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  .upload-zone:hover { background: #fff5f5; border-color: #e74c3c; }
+  .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .upload-icon { font-size: 3.5rem; display: block; margin-bottom: 15px; }
+
+  /* Progress Bar */
+  .progress-wrap { display: none; margin-top: 25px; background: #fff; border-radius: 10px; padding: 20px; }
+  .progress-bar-bg { background: #eee; border-radius: 50px; height: 12px; overflow: hidden; margin-top: 10px; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, #8b0000, #e74c3c); width: 0%; transition: 0.3s; }
+
+  /* Results Card */
+  .result-card { display: none; margin-top: 35px; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+  .result-header { background: #8b0000; color: #fff; padding: 18px 30px; display: flex; justify-content: space-between; align-items: center; }
+  .badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; }
+  
+  .result-body { 
+    padding: 40px; font-family: 'Times New Roman', Times, serif; 
+    font-size: 1.15rem; line-height: 1.7; color: #000; text-align: justify; 
+  }
+
+  /* Formatting for References */
+  .section-heading { 
+    display: block; font-weight: bold; color: #8b0000; margin-top: 25px; 
+    margin-bottom: 10px; font-size: 1.25rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 5px;
+  }
+  .ref-line { display: block; padding-left: 35px; text-indent: -35px; margin-bottom: 10px; }
+
+  .copy-btn { 
+    margin: 20px 40px 40px; padding: 12px 25px; background: #27ae60; color: #fff; 
+    border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem;
+    transition: 0.2s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .copy-btn:hover { background: #219150; transform: translateY(-1px); }
+  .error { color: #c0392b; text-align: center; margin-top: 15px; font-weight: 500; display: none; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>📚 Trích Xuất Tài Liệu Tham Khảo</h1>
+
+  <div class="upload-zone">
+    <input type="file" id="fileInput" accept=".pdf">
+    <span class="upload-icon">📄</span>
+    <p>Kéo thả hoặc chọn file PDF để bắt đầu</p>
+  </div>
+
+  <div id="errorMsg" class="error"></div>
+
+  <div class="progress-wrap" id="progressWrap">
+    <div id="progressLabel" style="font-size: 0.9rem;">Đang xử lý...</div>
+    <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+
+  <div class="result-card" id="resultCard">
+    <div class="result-header">
+      <h2>NỘI DUNG TRÍCH XUẤT</h2>
+      <span class="badge" id="countBadge">0 tài liệu</span>
+    </div>
+    <div class="result-body" id="resultBody"></div>
+    <button class="copy-btn" id="copyBtn">📋 Sao chép danh mục</button>
+  </div>
+</div>
+
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  const fileInput = document.getElementById('fileInput');
+  const resultCard = document.getElementById('resultCard');
+  const resultBody = document.getElementById('resultBody');
+  const progressBar = document.getElementById('progressBar');
+  const progressWrap = document.getElementById('progressWrap');
+  const countBadge = document.getElementById('countBadge');
+
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    resultCard.style.display = 'none';
+    progressWrap.style.display = 'block';
+    
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let allLines = [];
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        document.getElementById('progressLabel').textContent = `Đang quét trang ${i}/${pdf.numPages}...`;
+        progressBar.style.width = `${(i / pdf.numPages) * 100}%`;
+        
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const lineMap = {};
+
+        textContent.items.forEach(item => {
+          const y = Math.round(item.transform[5]);
+          // Dùng dung sai 5 đơn vị để gộp các thành phần trên cùng một dòng
+          let foundY = Object.keys(lineMap).find(key => Math.abs(key - y) <= 5);
+          if (foundY) lineMap[foundY].push(item);
+          else lineMap[y] = [item];
+        });
+
+        Object.keys(lineMap).sort((a, b) => b - a).forEach(y => {
+          const line = lineMap[y].sort((a, b) => a.transform[4] - b.transform[4])
+            .map(item => item.str).join(' ').trim();
+          if (line) allLines.push(line);
+        });
+      }
+      processLines(allLines);
+    } catch (err) {
+      alert("Lỗi khi đọc file: " + err.message);
+    } finally {
+      progressWrap.style.display = 'none';
+    }
+  });
+
+  function processLines(lines) {
+    let startIdx = -1;
+    // 1. Tìm điểm bắt đầu
+    for (let i = 0; i < lines.length; i++) {
+      const clean = lines[i].toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (clean.includes("DANH MUC TAI LIEU THAM KHAO")) {
+        startIdx = i + 1;
+        break;
+      }
+    }
+
+    if (startIdx === -1) {
+      alert("Không tìm thấy tiêu đề 'Danh mục tài liệu tham khảo'");
+      return;
+    }
+
+    // 2. Lọc nội dung và dừng nếu gặp Phụ lục
+    const finalLines = [];
+    for (let i = startIdx; i < lines.length; i++) {
+      const clean = lines[i].toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (clean.startsWith("PHU LUC") || clean.startsWith("APPENDIX")) break;
+      finalLines.push(lines[i].trim());
+    }
+
+    // 3. Hiển thị và Nhận diện mục con
+    let html = "";
+    let count = 0;
+    
+    finalLines.forEach(line => {
+      const clean = line.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      
+      // Kiểm tra tiêu đề mục I, II... hoặc từ khóa quan trọng
+      const isHeader = /^(I{1,3}|IV|V)\./.test(line) || 
+                       clean.includes("VAN BAN QUY PHAM") || 
+                       clean.includes("SACH, BAO, TAP CHI") ||
+                       clean.includes("TAI LIEU NUOC NGOAI") ||
+                       clean.includes("TRANG WEB");
+
+      if (isHeader) {
+        html += `<span class="section-heading">${escapeHtml(line)}</span>`;
+      } else {
+        if (/^\d+[.)]/.test(line)) count++; // Đếm nếu là dòng có số thứ tự
+        html += `<span class="ref-line">${escapeHtml(line)}</span>`;
+      }
+    });
+
+    resultBody.innerHTML = html;
+    countBadge.textContent = `${count} tài liệu`;
+    resultCard.style.display = 'block';
+
+    document.getElementById('copyBtn').onclick = () => {
+      navigator.clipboard.writeText(finalLines.join('\n'));
+      alert("Đã sao chép thành công!");
+    };
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+</script>
+
+</body>
+</html>
