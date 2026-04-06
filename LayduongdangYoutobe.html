@@ -148,8 +148,8 @@
 
 <body>
     <div class="card">
-        <h2>🎬 Tạo HTML nhúng YouTube</h2>
-        <p class="sub">Dán link YouTube vào, tự động tạo đoạn HTML có dòng cảnh báo và iframe</p>
+        <h2>🎬 Tạo HTML link YouTube</h2>
+        <p class="sub">Dán link YouTube vào, tự động tạo đoạn HTML có dòng thông báo và link truy cập</p>
 
         <label>Link YouTube</label>
         <input type="text" id="linkInput" placeholder="https://youtu.be/... hoặc https://www.youtube.com/watch?v=..." />
@@ -195,7 +195,7 @@
             errorMsg.style.display = 'none';
 
             const shortLink = `https://youtu.be/${id}`;
-            const html = `Nếu video không hiển thị thì bấm vào truy cập:<br>\n<p><a href="${shortLink}">Truy cập</a><br></p>\n\n<p>\n  <iframe\n    width="560"\n    height="315"\n    src="https://www.youtube.com/embed/${id}"\n    allowfullscreen\n    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">\n  </iframe>\n</p>`;
+            const html = `Nếu video không hiển thị thì bấm vào truy cập:<br>\n<p><a href="${shortLink}">Truy cập</a><br></p>`;
 
             document.getElementById('outputCode').value = html;
             outputBox.style.display = 'block';
