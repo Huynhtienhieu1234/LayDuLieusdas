@@ -162,7 +162,7 @@
                 <span>Kết quả HTML</span>
                 <button class="copy-btn" id="copyBtn" onclick="copyCode()">📋 Copy</button>
             </div>
-            <textarea id="outputCode" rows="8" readonly></textarea>
+            <textarea id="outputCode" rows="12" readonly></textarea>
         </div>
     </div>
 
@@ -195,7 +195,7 @@
             errorMsg.style.display = 'none';
 
             const shortLink = `https://youtu.be/${id}`;
-            const html = `Nếu video không hiển thị thì bấm vào chữ\n<p><a href="${shortLink}">Option 2</a><br></p>`;
+            const html = `<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fcebeb; border: 1px solid #ff0000; padding: 20px; border-radius: 12px; max-width: 540px; margin: 15px 0; text-align: center; box-shadow: 0 4px 12px rgba(255, 0, 0, 0.08);">\n    <p style="margin: 0 0 15px 0; color: #333; font-size: 16px; font-weight: 500; line-height: 1.5;">Nếu video không hiển thị thì bấm vào chữ</p>\n    <a href="${shortLink}" target="_blank" style="display: inline-block; background-color: #ff0000; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 8px rgba(255, 0, 0, 0.25);">Option 2</a>\n</div>`;
 
             document.getElementById('outputCode').value = html;
             outputBox.style.display = 'block';
