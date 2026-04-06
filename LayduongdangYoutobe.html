@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            padding: 32px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+
+        .sub {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border 0.2s;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"]:focus {
+            border-color: #ff0000;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #ff0000;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #cc0000;
+        }
+
+        .output-box {
+            margin-top: 24px;
+            display: none;
+        }
+
+        .output-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-btn {
+            background: #f0f0f0;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .copy-btn.copied {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+            background: #fafafa;
+            resize: none;
+            outline: none;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .error {
+            color: #cc0000;
+            font-size: 13px;
+            margin-top: -14px;
+            margin-bottom: 14px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2>🎬 Tạo HTML nhúng YouTube</h2>
+        <p class="sub">Dán link YouTube vào, tự động tạo đoạn HTML có dòng cảnh báo và iframe</p>
+
+        <label>Link YouTube</label>
+        <input type="text" id="linkInput" placeholder="https://youtu.be/... hoặc https://www.youtube.com/watch?v=..." />
+        <div class="error" id="errorMsg">⚠️ Link không hợp lệ, vui lòng kiểm tra lại.</div>
+
+        <button class="btn" onclick="generate()">Tạo HTML</button>
+
+        <div class="output-box" id="outputBox">
+            <div class="output-label">
+                <span>Kết quả HTML</span>
+                <button class="copy-btn" id="copyBtn" onclick="copyCode()">📋 Copy</button>
+            </div>
+            <textarea id="outputCode" rows="8" readonly></textarea>
+        </div>
+    </div>
+
+    <script>
+        function extractId(url) {
+            url = url.trim();
+            let match;
+            match = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+            if (match) return match[1];
+            match = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+            if (match) return match[1];
+            match = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/);
+            if (match) return match[1];
+            return null;
+        }
+
+        function generate() {
+            const input = document.getElementById('linkInput').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            const outputBox = document.getElementById('outputBox');
+
+            const id = extractId(input);
+
+            if (!id) {
+                errorMsg.style.display = 'block';
+                outputBox.style.display = 'none';
+                return;
+            }
+
+            errorMsg.style.display = 'none';
+
+            const shortLink = `https://youtu.be/${id}`;
+            const html = `Nếu video không hiển thị thì bấm vào truy cập:<br>\n<p><a href="${shortLink}">Truy cập</a><br></p>\n\n<p>\n  <iframe\n    width="560"\n    height="315"\n    src="https://www.youtube.com/embed/${id}"\n    allowfullscreen\n    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">\n  </iframe>\n</p>`;
+
+            document.getElementById('outputCode').value = html;
+            outputBox.style.display = 'block';
+
+            const copyBtn = document.getElementById('copyBtn');
+            copyBtn.textContent = '📋 Copy';
+            copyBtn.classList.remove('copied');
+        }
+
+        function copyCode() {
+            const text = document.getElementById('outputCode').value;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = '✅ Đã copy!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Cho phép nhấn Enter
+        document.getElementById('linkInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') generate();
+        });
+    </script>
+</body>
+
+</html>
