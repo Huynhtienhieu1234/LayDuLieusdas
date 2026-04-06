@@ -143,6 +143,30 @@
             margin-bottom: 14px;
             display: none;
         }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            color: white;
+            background: #28a745;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 
@@ -165,6 +189,7 @@
             <textarea id="outputCode" rows="8" readonly></textarea>
         </div>
     </div>
+    <div class="toast" id="toast"></div>
 
     <script>
         function extractId(url) {
@@ -203,6 +228,8 @@
             const copyBtn = document.getElementById('copyBtn');
             copyBtn.textContent = '📋 Copy';
             copyBtn.classList.remove('copied');
+
+            showToast('✅ Đã tạo HTML thành công!');
         }
 
         function copyCode() {
@@ -215,7 +242,17 @@
                     btn.textContent = '📋 Copy';
                     btn.classList.remove('copied');
                 }, 2000);
+                showToast('📋 Đã sao chép vào clipboard!');
             });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
         }
 
         // Cho phép nhấn Enter
